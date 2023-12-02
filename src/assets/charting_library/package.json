@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "description": "TT v26.003 (internal id e793d706 @ 2023-10-05T20:30:59.543Z)",
+  "type": "module",
+  "main": "charting_library.cjs.js",
+  "module": "charting_library.esm.js",
+  "types": "charting_library.d.ts"
+}

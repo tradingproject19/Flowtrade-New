@@ -1,0 +1,13 @@
+div[class^='group-']:has(button[data-tooltip="Open Main Menu"]) {
+  /* Move the dropdown menu button to the left edge of the toolbar */
+  order: -1;
+}
+
+div[class^='group-']:has(button[data-tooltip="Open Main Menu"]) + div[class^="separatorWrap-"] {
+  /* Hide the separator after the created dropdown menu button */
+  display: none;
+}
+
+button[data-tooltip="Open Main Menu"] div[data-name="dropdown"] {
+  padding: 0 10px;
+}
