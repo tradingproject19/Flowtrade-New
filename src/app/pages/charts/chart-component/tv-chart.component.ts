@@ -14,10 +14,16 @@ import {
   ChartMetaInfo,
   ChartTemplateContent,
   ChartingLibraryWidgetOptions,
+  CustomIndicator,
   IChartingLibraryWidget,
+  IPineStudyResult,
   LanguageCode,
+  LibraryPineStudy,
   NewsItem,
+  RawStudyMetaInfoId,
   ResolutionString,
+  StudyLinePlotPreferences,
+  StudyPlotType,
   StudyTemplateData,
   StudyTemplateMetaInfo,
   TradingTerminalWidgetOptions,
@@ -211,7 +217,10 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
           await this.httpService.removeChart(id, this.userId);
         },
         saveChart: async (chartData: ChartData) => {
-          let result = await this.httpService.saveChart(chartData, this.user.uid);
+          let result = await this.httpService.saveChart(
+            chartData,
+            this.user.uid
+          );
           return result?.data;
         },
         getChartContent: async (chartId: number) => {
@@ -302,7 +311,102 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
           return new Promise<any>((data: any) => {});
         },
       },
-      debug: true,
+      //debug: true,
+      custom_indicators_getter: (PineJS) => {
+        return Promise.resolve<CustomIndicator[]>([
+          /* Requesting data for another ticker */
+          {
+            name: "Equity Flowtrade",
+            metainfo: {
+              _metainfoVersion: 51,
+              id: "EquityFT@tv-basicstudies-1" as RawStudyMetaInfoId,
+              description: "Equity Flowtrade",
+              shortDescription: "Equity Flowtrade",
+              is_price_study: true,
+              isCustomIndicator: true,
+              format: {
+                type: "price",
+                // Precision is set to one digit, e.g. 777.7
+                precision: 1,
+              },
+
+              plots: [{ id: "plot_0", type: StudyPlotType.Line }],
+              defaults: {
+                styles: {
+                  plot_0: {
+                    linestyle: 0,
+                    visible: true,
+
+                    // Make the line thinner
+                    linewidth: 1,
+
+                    // Plot type is Line
+                    plottype: 2 as StudyLinePlotPreferences["plottype"],
+
+                    // Show price line
+                    trackPrice: true,
+
+                    // Set the plotted line color to dark red
+                    color: "#880000",
+                  },
+                },
+
+                inputs: {},
+              },
+              styles: {
+                plot_0: {
+                  // Output name will be displayed in the Style window
+                  title: "Equity value",
+                  histogramBase: 0,
+                },
+              },
+              inputs: [],
+            },
+
+            constructor: function (this: LibraryPineStudy<IPineStudyResult>) {
+              this.init = function (context, inputCallback) {
+                console.log(context);
+                this._context = context;
+                this._input = inputCallback;
+
+                const symbol = context.symbol.ticker; // #EQUITY should be replaced with the symbol you want to resolve
+                this._context.new_sym(symbol, PineJS.Std.period(this._context));
+              };
+
+              this.main = function (context, inputCallback) {
+                this._context = context;
+                this._input = inputCallback;
+                // Select the main symbol
+                this._context.select_sym(0);
+                const mainSymbolTime = this._context.new_var(
+                  this._context.symbol.time
+                );
+
+                // Select the secondary symbol ("#EQUITY")
+                this._context.select_sym(1);
+                const secondarySymbolTime = this._context.new_var(
+                  this._context.symbol.time
+                );
+
+                // Align the times of the secondary symbol to the main symbol
+                const secondarySymbolClose = this._context.new_var(
+                  PineJS.Std.close(this._context)
+                );
+                const alignedClose = secondarySymbolClose.adopt(
+                  secondarySymbolTime,
+                  mainSymbolTime,
+                  1
+                );
+
+                // Select the main symbol again
+                this._context.select_sym(0);
+
+                return [alignedClose];
+              };
+            },
+          },
+        ]);
+      },
     };
 
     const tvWidget = new widget(widgetOptions);
