@@ -178,7 +178,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         "paneProperties.background": "#222736",
         "scalesProperties.textColor": "#a6b0cf",
       },
-      //debug: true,
+      debug: false,
       news_provider: async (symbol, callback) => {
         let newItem = await this.dataService.getTickerNews(symbol);
         let result: NewsItem[] = [];
