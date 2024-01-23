@@ -23,6 +23,12 @@ const routes: Routes = [
       import("./pages/charts/charts.module").then((m) => m.ChartsModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: "videos",
+    loadChildren: () =>
+      import("./pages/videos/videos.module").then((m) => m.VideosModule),
+    canActivate: [AuthGuard],
+  },
 ];
 
 @NgModule({
