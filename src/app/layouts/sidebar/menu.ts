@@ -15,6 +15,12 @@ export const MENU: MenuItem[] = [
         label: 'Charts',
         icon: 'bx-bar-chart',
         link: '/charts',
+    },
+    {
+        id: 20,
+        label: 'Videos',
+        icon: 'bx-bar-chart',
+        link: '/videos',
     }
 ];
 

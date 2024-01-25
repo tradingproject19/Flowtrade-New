@@ -1,1 +1,31 @@
-<p>videos works!</p>
+
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+      <div class="col-12">
+          <div class="page-title-box d-flex align-items-center justify-content-between">
+              <h4 class="mb-0 font-size-18">Videos</h4>
+              <div class="page-title-right">
+                  <ol class="breadcrumb m-0">
+                      <ng-container>
+                          <li class="breadcrumb-item"><a href="javascript: void(0);">Videos</a>
+                          </li>
+                          <li class="breadcrumb-item active">Videos
+                          </li>
+                      </ng-container>
+                  </ol>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- end page title -->
+  <!-- start video playlist -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-video d-flex align-items-left">
+          <!-- <iframe [src]='safeURL' width="560" height="315" frameborder="0" allowfullscreen></iframe> -->
+          <iframe width="560" height="315" [src]='safeURL' title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</div> <!-- container-fluid -->
