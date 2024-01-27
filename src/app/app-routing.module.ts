@@ -37,6 +37,13 @@ const routes: Routes = [
       import("./pages/options/options.module").then((m) => m.OptionsModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: "chat",
+    component: LayoutComponent,
+    loadChildren: () =>
+      import("./pages/chat/chat.module").then((m) => m.ChatModule),
+    canActivate: [AuthGuard],
+  },
 ];
 
 @NgModule({
