@@ -25,8 +25,16 @@ const routes: Routes = [
   },
   {
     path: "videos",
+    component: LayoutComponent,
     loadChildren: () =>
       import("./pages/videos/videos.module").then((m) => m.VideosModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: "options",
+    component: LayoutComponent,
+    loadChildren: () =>
+      import("./pages/options/options.module").then((m) => m.OptionsModule),
     canActivate: [AuthGuard],
   },
 ];
