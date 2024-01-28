@@ -19,49 +19,49 @@ export const MENU: MenuItem[] = [
     {
         id: 20,
         label: 'Videos',
-        icon: 'bx-bar-chart',
+        icon: 'bx bxl-youtube',
         link: '/videos',
     }
     ,
     {
         id: 30,
         label: 'Chat',
-        icon: 'bx-bar-chart',
+        icon: 'bx bx-chat',
         link: '/chat',
         // embeded chat discord
     },
     {
         id: 40,
         label: 'Options Flow / GEX',
-        icon: 'bx-bar-chart',
+        icon: 'bx bx-bar-chart-alt-2',
         link: '/options',
         // batnami built this need to remap data to a new layout 2 sections so have dropdown
     },
     {
         id: 50,
         label: 'Dark Pool',
-        icon: 'bx-bar-chart',
+        icon: 'bx bx-ghost',
         link: '/dark-pool',
         // block trade scanners, blocks, data in table format
     },
     {
         id: 60,
         label: 'Scanner',
-        icon: 'bx-bar-chart',
+        icon: 'bx bx-repeat',
         link: '/scanner',
         // divergence alpha flow scanners
     },
     {
         id: 70,
         label: 'Social',
-        icon: 'bx-bar-chart',
+        icon: 'bx bx-group',
         link: '/social',
         // posting charts gammification
     },
     {
         id: 80,
         label: 'Crypto',
-        icon: 'bx-bar-chart',
+        icon: 'bx bxl-bitcoin',
         link: '/crypto',
         // add this link but have it coming soon
     }
@@ -69,8 +69,8 @@ export const MENU: MenuItem[] = [
     {
         id: 90,
         label: 'FT Classic',
-        icon: 'bx-bar-chart',
-        link: '/ft-classic',
+        icon: 'bx bxs-barcode',
+        link: '/classic',
         // add this link but have it coming soon
     }
 ];
