@@ -36,6 +36,7 @@ import { SharedModule } from "./shared/shared.module";
 export function createTranslateLoader(http: HttpClient): any {
   return new TranslateHttpLoader(http, "assets/i18n/", ".json");
 }
+import {YouTubePlayerModule} from '@angular/youtube-player';
 
 const DATABASE_SHARD_URLS = [
   "https://tradingproject19-f513b.firebaseio.com", //0
@@ -136,6 +137,7 @@ const DATABASE_SHARD_URLS = [
     ScrollToModule.forRoot(),
     ToastrModule.forRoot(),
     SharedModule,
+    YouTubePlayerModule,
   ],
   bootstrap: [AppComponent],
   providers: [

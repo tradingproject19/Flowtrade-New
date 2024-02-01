@@ -274,10 +274,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/youtube-player@^17.1.2":
-  version "17.1.2"
-  resolved "https://registry.npmjs.org/@angular/youtube-player/-/youtube-player-17.1.2.tgz"
-  integrity sha512-WEKuR+JAvxlBZ0Q3PFReO3EkGu9vXVipxNPUVnZGNbiGCnp91Oy3M328sR7eF9luuJSD5W3YjfdvSYWOJKe72w==
+"@angular/youtube-player@^16.2.13":
+  version "16.2.13"
+  resolved "https://registry.npmjs.org/@angular/youtube-player/-/youtube-player-16.2.13.tgz"
+  integrity sha512-DWfQdFK2ljjffslmmRHr61ZJYkGK5MXZiHSx7K3OpNnP+2KJjoKnxW4lGtY6ZHOVJtSUWgUMTeldXXjsnjcNew==
   dependencies:
     "@types/youtube" "^0.0.42"
     tslib "^2.3.0"
