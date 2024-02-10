@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { VideosRoutingModule } from './videos-routing.module';
+
 import { UIModule } from '../../shared/ui/ui.module';
 import { WidgetModule } from '../../shared/widget/widget.module';
 
@@ -16,12 +16,15 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { SimplebarAngularModule } from 'simplebar-angular';
 
-import { VideosComponent } from './video-page/videos.component';
+
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ChartsModule } from '../charts/charts.module';
 
+import { YouTubePlayerModule } from '@angular/youtube-player';
+import { VideoComponent } from './video-page/videos.component';
+import { VideosRoutingModule } from './videos-routing.module';
+
 @NgModule({
-  declarations: [VideosComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -38,7 +41,10 @@ import { ChartsModule } from '../charts/charts.module';
     ModalModule.forRoot(),
     SharedModule,
     ChartsModule,
+    YouTubePlayerModule,
   ],
+  declarations: [VideoComponent],
+  exports: [VideoComponent],
   providers: [BsDropdownConfig],
 })
 export class VideosModule { }

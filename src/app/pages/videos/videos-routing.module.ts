@@ -1,12 +1,12 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 
-import { VideosComponent } from "./video-page/videos.component";
+import { VideoComponent } from "./video-page/videos.component";
 
 const routes: Routes = [
   {
     path: "",
-    component: VideosComponent
+    component: VideoComponent
   },
 ];
 

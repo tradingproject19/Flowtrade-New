@@ -24,7 +24,23 @@
     <div class="col-12">
       <div class="page-video d-flex align-items-left">
           <!-- <iframe [src]='safeURL' width="560" height="315" frameborder="0" allowfullscreen></iframe> -->
-          <iframe width="560" height="315" [src]='safeURL' title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          <!-- <iframe width="560" height="315" [src]='safeURL' title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
+          <youtube-player
+            videoId="dQw4w9WgXcQ"
+            suggestedQuality="highres"
+            [height]="600"
+            [width]="1080"
+            [startSeconds]="43"
+            [endSeconds]="60">
+          </youtube-player>
+      </div>
+      <div class="page-video d-flex align-items-left">
+        <youtube-player
+          videoId="EA3br0veLH0"
+          suggestedQuality="highres"
+          [height]="600"
+          [width]="1080">
+        </youtube-player>
       </div>
     </div>
   </div>

@@ -1,14 +1,16 @@
-import { Component } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Component, OnInit  } from '@angular/core';
+
 
 @Component({
   selector: 'app-videos',
+  // template: '<youtube-player videoId="dQw4w9WgXcQ"></youtube-player>',
   templateUrl: './videos.component.html',
   styleUrls: ['./videos.component.scss'],
 })
-export class VideosComponent {
-  public safeURL: SafeResourceUrl;
-  constructor(private _sanitizer: DomSanitizer) {
-  this.safeURL = this._sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/QdJn2wh8kf0?si=H2mW9Mzz1egggvLb');
+export class VideoComponent implements OnInit {
+  ngOnInit() {
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.body.appendChild(tag);
   }
 }
