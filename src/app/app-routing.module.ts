@@ -23,6 +23,27 @@ const routes: Routes = [
       import("./pages/charts/charts.module").then((m) => m.ChartsModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: "videos",
+    component: LayoutComponent,
+    loadChildren: () =>
+      import("./pages/videos/videos.module").then((m) => m.VideosModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: "options",
+    component: LayoutComponent,
+    loadChildren: () =>
+      import("./pages/options/options.module").then((m) => m.OptionsModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: "chat",
+    component: LayoutComponent,
+    loadChildren: () =>
+      import("./pages/chat/chat.module").then((m) => m.ChatModule),
+    canActivate: [AuthGuard],
+  },
 ];
 
 @NgModule({
