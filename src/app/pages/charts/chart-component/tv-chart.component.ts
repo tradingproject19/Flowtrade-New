@@ -19,6 +19,9 @@ import {
   IPineStudyResult,
   LanguageCode,
   LibraryPineStudy,
+  LineToolsAndGroupsLoadRequestContext,
+  LineToolsAndGroupsLoadRequestType,
+  LineToolsAndGroupsState,
   NewsItem,
   RawStudyMetaInfoId,
   ResolutionString,
@@ -296,20 +299,26 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         },
 
         getChartTemplateContent: async (templateName: string) => {
-          return new Promise<any>((data: any) => {});
+          return new Promise<any>((data: any) => { });
         },
         getAllChartTemplates(): Promise<string[]> {
-          return new Promise<any>((data: any) => {});
+          return new Promise<any>((data: any) => { });
         },
         saveChartTemplate(
           newName: string,
           theme: ChartTemplateContent
         ): Promise<void> {
-          return new Promise<any>((data: any) => {});
+          return new Promise<any>((data: any) => { });
         },
         removeChartTemplate(templateName: string): Promise<void> {
-          return new Promise<any>((data: any) => {});
+          return new Promise<any>((data: any) => { });
         },
+        saveLineToolsAndGroups: function (layoutId: string, chartId: string | number, state: LineToolsAndGroupsState): Promise<void> {
+          throw new Error("Function not implemented.");
+        },
+        loadLineToolsAndGroups: function (layoutId: string, chartId: string | number, requestType: LineToolsAndGroupsLoadRequestType, requestContext: LineToolsAndGroupsLoadRequestContext): Promise<Partial<LineToolsAndGroupsState>> {
+          throw new Error("Function not implemented.");
+        }
       },
       //debug: true,
       custom_indicators_getter: (PineJS) => {

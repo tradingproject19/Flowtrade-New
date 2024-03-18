@@ -6,6 +6,9 @@ import {
   ChartTemplate,
   ChartTemplateContent,
   IExternalSaveLoadAdapter,
+  LineToolsAndGroupsLoadRequestContext,
+  LineToolsAndGroupsLoadRequestType,
+  LineToolsAndGroupsState,
   StudyTemplateData,
   StudyTemplateMetaInfo,
 } from "../../../assets/charting_library/charting_library";
@@ -21,6 +24,12 @@ export class SaveLoadAdapterService implements IExternalSaveLoadAdapter {
     private httpService: DatabaseService
   ) {
     this.userId = this.firebaseBackend.getAuthenticatedUser().uid;
+  }
+  saveLineToolsAndGroups(layoutId: string, chartId: string | number, state: LineToolsAndGroupsState): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  loadLineToolsAndGroups(layoutId: string, chartId: string | number, requestType: LineToolsAndGroupsLoadRequestType, requestContext: LineToolsAndGroupsLoadRequestContext): Promise<Partial<LineToolsAndGroupsState>> {
+    throw new Error("Method not implemented.");
   }
   getAllCharts = async (): Promise<ChartMetaInfo[]> => {
     let charts = await this.httpService.getAllCharts(this.userId);

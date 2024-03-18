@@ -139,7 +139,7 @@ export class ChartDataFeed implements IDatafeedChartApi, IExternalDatafeed {
         description: symbolInfo.name,
         long_description: symbolInfo.description,
         exchange: symbolInfo.primary_exchange,
-        full_name: symbolInfo.ticker,
+        base_name: [symbolInfo.ticker],
         ticker: symbolInfo.ticker,
         has_seconds: true,
         supported_resolutions: SupportedResolutions as ResolutionString[],

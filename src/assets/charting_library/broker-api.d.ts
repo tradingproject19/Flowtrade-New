@@ -55,7 +55,7 @@ export declare const enum OrderType {
 export declare const enum ParentType {
 	Order = 1,
 	Position = 2,
-	Trade = 3
+	IndividualPosition = 3
 }
 export declare const enum PriceType {
 	Limit = 1,
@@ -65,6 +65,10 @@ export declare const enum Side {
 	Buy = 1,
 	Sell = -1
 }
+/**
+ * Enumeration of the built-in formatters for the Account Manager columns.
+ * Refer to the [Value formatters](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/value-formatters.md) section for more information.
+ */
 export declare const enum StandardFormatterName {
 	Date = "date",
 	DateOrDateTime = "dateOrDateTime",
@@ -116,74 +120,51 @@ export declare enum StopType {
 export declare type Nominal<T, Name extends string> = T & { /* eslint-disable-next-line jsdoc/require-jsdoc */
 	[Symbol.species]: Name;
 };
-/** Column description for an account manager table */
+/** Column properties for the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md) pages. */
 export interface AccountManagerColumnBase<TFormatterName extends StandardFormatterName | FormatterName> {
 	/** Column title. It will be displayed in the table's header row. */
 	label: string;
 	/**
 	 * Horizontal alignment of the cell value. The default value is `left`.
 	 *
-	 * | alignment    |   description  |
+	 * | Alignment    |   Description  |
 	 * |--------------|----------------|
-	 * | left         | It aligns the cell value to the left |
-	 * | right        | It aligns the cell value to the right |
+	 * | left         | It aligns the cell value to the left. |
+	 * | right        | It aligns the cell value to the right. |
 	 */
 	alignment?: CellAlignment;
-	/** Column id. Unique identifier of column. */
+	/** Unique column identifier. */
 	id: string;
 	/**
-	 * Name of the formatter to be used for data formatting. It can be one of two types - `StandardFormatterName` or `FormatterName`. If `formatter` is not set, then the value is displayed as is.
-	 * Formatter can be a default or a custom one.
+	 * Defines a formatter to be applied for data formatting, which can either belong to the `StandardFormatterName` or `FormatterName` type.
+	 * If no specific formatter is set, the value is displayed as is.
 	 *
-	 * Default formatter names are listed in `StandardFormatterName` enumerator. If you want to use a custom formatter, you must typecast its name to `FormatterName` to confirm your confidence that you are using the correct name.
+	 * Default formatter names are enumerated in {@link StandardFormatterName}.
+	 * Refer to the [Default formatters](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/value-formatters.md#default-formatters) section to see the full list of formatters.
 	 *
-	 * Here is the list of default formatters:
-	 *
-	 * | name | description |
-	 * | ---- | ----------- |
-	 * | `StandardFormatterName.Date` | Displays the date or time. |
-	 * | `StandardFormatterName.DateOrDateTime` | Displays the date or date and time. This formatter accepts an `{dateOrDateTime: number, hasTime: boolean}` object. If `hasTime` is set to `true` then the date and time are displayed. Otherwise only the date is displayed.|
-	 * | `StandardFormatterName.Fixed` | Displays a number with 2 decimal places. |
-	 * | `StandardFormatterName.FixedInCurrency` | Displays a number with 2 decimal places and adds currency. |
-	 * | `StandardFormatterName.FormatPrice` | Displays symbol's price. |
-	 * | `StandardFormatterName.FormatQuantity` | Displays an integer or floating point quantity, separates thousands groups with a space. |
-	 * | `StandardFormatterName.FormatPriceForexSup` | The same as `formatPrice`, but it makes the last character of the price superscripted. It works only if instrument type is set to `forex`.|
-	 * | `StandardFormatterName.LocalDate` | Displays the local date or time. |
-	 * | `StandardFormatterName.LocalDateOrDateTime` | The same as `StandardFormatterName.DateOrDateTime`, but it displays time in the local timezone. |
-	 * | `StandardFormatterName.Pips` | Displays a number with 1 decimal place. |
-	 * | `StandardFormatterName.Profit` | Displays profit in account currency. It also adds the `+` sign, separates thousands and changes the cell text color to red or green. |
-	 * | `StandardFormatterName.ProfitInInstrumentCurrency` | Displays profit in instrument currency. It also adds the `+` sign, separates thousands and changes the cell text color to red or green. |
-	 * | `StandardFormatterName.Side` | It is used to display the side: Sell or Buy. |
-	 * | `StandardFormatterName.PositionSide` | It is used to display the position side: Short or Long. |
-	 * | `StandardFormatterName.Status` | It is used to format the `status`. |
-	 * | `StandardFormatterName.Symbol` | It is used for a symbol field. It displays `brokerSymbol`, but when you click on a symbol the chart changes according to the `symbol` field. |
-	 * | `StandardFormatterName.Text` | Displays a text value. |
-	 * | `StandardFormatterName.Type` | It is used to display the type of order: Limit/Stop/StopLimit/Market. |
-	 * | `StandardFormatterName.VariablePrecision` | Displays a number with variable precision. |
+	 * You can also create custom formatters using the {@link AccountManagerInfo.customFormatters} property.
 	 */
 	formatter?: TFormatterName;
 	/**
-	 * `dataFields` is an array with data object fields that is used to get the data to display in a column.
+	 * The `dataFields` array contains fields from an order/position data object.
+	 * `dataFields` is used to generate the values displayed in a column.
+	 * The displayed value in the column updates only when the corresponding values in the data object change.
 	 *
-	 * The displayed value in the column will only change if one of the corresponding data object values change.
-	 *
-	 * If the `formatter` is not set, the displayed values will be space-separated in the column.
-	 *
-	 * If a `formatter` is specified, it will only get the specified values.
-	 *
-	 * Specify an empty array as the `dataFields` and the formatter will receive the entire data object.
+	 * If no {@link formatter} is specified, the displayed values will be space-separated in the column.
+	 * When a `formatter` is defined, it processes only the specified values.
+	 * If an empty array is assigned to `dataFields`, the `formatter` will receive the entire data object.
 	 *
 	 * **Example**
-	 * Example
 	 *
-	 * - If you have column with `dataFields` set as `['avgPrice', 'qty']`, then displayed value will update only if `avgPrice` or `qty` values of the data object have been changed.
-	 * - If you have column with `dataFields` set as `[]`, then displayed value will update if some data object values have been changed.
+	 * - For a column with `dataFields` set as `['avgPrice', 'qty']`, the displayed value updates only when the `avgPrice` or `qty` values in the data object change.
+	 * - For a column with an empty `dataFields` array, the displayed value updates if any values in the data object change.
 	 */
 	dataFields: TFormatterName extends StandardFormatterName ? StandardFormattersDependenciesMapping[TFormatterName] : string[];
 	/**
-	 * Data object key that is used for data sorting
+	 * Data object key that is used for data sorting.
 	 *
-	 * If `sortProp` is not provided, then the first element of the `dataFields` array will be used. If the `dataFields` array is empty, then column sorting will be unavailable.
+	 * If `sortProp` is not provided, the first element of the `dataFields` array will be used.
+	 * If the `dataFields` array is empty, the column sorting will be unavailable.
 	 */
 	sortProp?: string;
 	/** When set to `true` will prevent column sorting. */
@@ -191,12 +172,14 @@ export interface AccountManagerColumnBase<TFormatterName extends StandardFormatt
 	/** Tooltip string for the column. */
 	help?: string;
 	/**
-	 * `highlightDiff` can be set with `StandardFormatterName.FormatPrice` and `StandardFormatterName.FormatPriceForexSup` formatters to highlight the changes of the field. If set to `true` then custom formatters will also get previous values.
+	 * `highlightDiff` can be set with [`StandardFormatterName.FormatPrice`](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/value-formatters.md#formatPrice)
+	 * and [`StandardFormatterName.FormatPriceForexSup`](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/value-formatters.md#formatPriceForexSup) formatters to highlight the changes of the field.
+	 * If `highlightDiff is `true`, the custom formatters will also get previous values.
 	 */
 	highlightDiff?: boolean;
-	/** When set to `true` will prevent the column from hiding. */
+	/** Setting `notHideable` to `true` prevents the column from being hidden. */
 	notHideable?: boolean;
-	/** When set to `true` will hide the column by default */
+	/** Setting `hideByDefault` to `true` hides the column by default. */
 	hideByDefault?: boolean;
 	/** Key of the row object that is used to get the tooltip to display when hovering over a cell.
 	 * The tooltip property refers to an object whose keys are property names and
@@ -207,29 +190,37 @@ export interface AccountManagerColumnBase<TFormatterName extends StandardFormatt
 	 * will be capitalized. The default value is `true`.
 	 */
 	isCapitalize?: boolean;
-	/** When set to `true` any zero values will be hidden. Default is `true` */
+	/** Setting `showZeroValues` to `true` hides any zero values. The default value is `true`. */
 	showZeroValues?: boolean;
 }
+/**
+ * The information object that is used to build the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md).
+ */
 export interface AccountManagerInfo {
 	/** Name of the broker */
 	accountTitle: string;
-	/** Custom fields which will always be displayed above the pages. */
+	/**
+	 * Custom fields that are always displayed at the top-right corner of the Account Manager.
+	 * Refer to the [Account Summary row](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md#account-summary-row) section for more information.
+	 */
 	summary: AccountManagerSummaryField[];
 	/**
-	 * Optional array to define custom formatters.
-	 * Each description is an object with the following fields:
+	 * An optional array for defining [custom formatters](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/value-formatters.md#custom-formatters).
+	 * Each formatter description is an object with the following fields:
 	 *
-	 * 1. `name`: FormatterName
-	 *     - Unique name of a formatter.
+	 * - `name` ({@link FormatterName}): Unique formatter name.
 	 *
-	 * 1. `formatText`: [TableFormatTextFunction](#tableformattextfunction)
-	 *    -Function that is used for formatting of a cell value to `string`. Required because used to generate exported data.
+	 * - `formatText` ({@link TableFormatTextFunction}):
+	 * Function that is used for formatting a cell value to a string.
+	 * The `formatText` field is required because it is used to generate exported data.
+	 * You can return an empty string if you do not need this function.
 	 *
-	 * 1. `formatElement`: [CustomTableFormatElementFunction](#customtableformatelementfunction) | undefined
-	 *     - Optional function that is used for formatting of a cell value to `string` or `HTMLElement`.
+	 * - `formatElement` ({@link CustomTableFormatElementFunction} | `undefined`):
+	 * Optional function that is used for formatting a cell value to a string or an HTML element.
 	 *
-	 * If the `formatElement` function is provided, then only it will be used to format the displayed values, otherwise
-	 * `formatText` will be used. If you need to only display `string` values it is better to use only `formatText` for performance reasons.
+	 * If the `formatElement` function is provided, it only handles the formatting of displayed values.
+	 * Otherwise the `formatText` function is used.
+	 * For optimal performance, it is recommended to only use `formatText` if you intend to display only string values.
 	 *
 	 * **Example**
 	 * ```ts
@@ -253,28 +244,34 @@ export interface AccountManagerInfo {
 	 * ```
 	 */
 	customFormatters?: CustomTableElementFormatter[];
-	/** Columns description that you want to be displayed on the Orders page.
+	/** An array of data objects that create columns for the [Orders](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md#orders-and-positions) page.
 	 * You can display any field of an {@link Order}
 	 * or add your own fields to an order object and display them.
 	 */
 	orderColumns: OrderTableColumn[];
 	/** Optional sorting of the orders table. */
 	orderColumnsSorting?: SortingParameters;
-	/** History page will be displayed if it exists. All orders from previous sessions will be shown in the History. */
+	/**
+	 * An array of data objects that create columns for the [History](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md#history) page where all orders from previous sessions are shown.
+	 * Note that this page is only shown
+	 * if you set the {@link BrokerConfigFlags.supportOrdersHistory} to `true`
+	 * and implement the {@link IBrokerTerminal.ordersHistory} method.
+	 */
 	historyColumns?: AccountManagerColumn[];
-	/** Optional sorting of the history table. */
+	/** Optional sorting of the table on the [History](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md#history) page. */
 	historyColumnsSorting?: SortingParameters;
 	/**
+	 * An array of data objects that create columns for the [Positions](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md#orders-and-positions) page.
 	 * You can display any field of a {@link Position}
 	 * or add your own fields to a position object and display them.
 	 */
 	positionColumns?: AccountManagerColumn[];
 	/**
-	 * You can display any field of a {@link Trade}
-	 * or add your own fields to a trade object and display them.
+	 * You can display any field of an {@link IndividualPosition}
+	 * or add your own fields to an individualPosition object and display them.
 	 */
-	tradeColumns?: AccountManagerColumn[];
-	/** You can add new tabs in the Account Manager by using `pages`. Each tab is a set of tables. */
+	individualPositionColumns?: AccountManagerColumn[];
+	/** Adds [custom pages](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md#custom-pages) to the Account Manager. Each page is a set of tables. */
 	pages: AccountManagerPage[];
 	/** Optional list of statuses to be used in the orders filter. Default list is used if it hasn't been set. */
 	possibleOrderStatuses?: OrderStatus[];
@@ -396,12 +393,15 @@ export interface BaseInputFieldValidatorResult {
 	/** Is the base input value valid */
 	valid: boolean;
 }
+/**
+ * An object that contains information about a bracket order.
+ */
 export interface BracketOrder extends BracketOrderBase, CustomFields {
 }
 export interface BracketOrderBase extends PlacedOrderBase {
-	/** If order is a bracket then this should contain base order/position id. */
+	/** If an order is a bracket, it should contain an ID of a parent order/position. */
 	parentId: string;
-	/** Type of the bracket's parent */
+	/** Type of the bracket's parent. */
 	parentType: ParentType;
 }
 export interface Brackets {
@@ -414,200 +414,228 @@ export interface Brackets {
 }
 export interface BrokerConfigFlags {
 	/**
-	 * Display broker symbol name in the symbol search. You may usually want to disable it if broker symbols are the same or you are using internal numbers as broker symbol names.
-	 * @default true
-	 */
-	supportDisplayBrokerNameInSymbolSearch?: boolean;
-	/**
-	 * This flag can be used to change "Amount" to "Quantity" in Order Ticket.
+	 * Changes _Amount_ to _Quantity_ in Order Ticket.
 	 * @default false
 	 */
 	showQuantityInsteadOfAmount?: boolean;
 	/**
-	 * Broker supports brackets (take profit and stop loss) for orders.
+	 * Enables order brackets: take-profit and stop-loss.
 	 * @default false
 	 */
 	supportOrderBrackets?: boolean;
 	/**
-	 * Broker supports trailing stop orders.
-	 * If this flag is set to `true`, then the chart displays trailing stop orders and a user can place a trailing stop order using Order Ticket.
+	 * Enables trailing stop orders.
+	 * If you set this flag to `true`, the library displays trailing stop orders and a user can place a trailing stop order using the Order Ticket.
 	 * @default false
 	 */
 	supportTrailingStop?: boolean;
 	/**
-	 * Broker supports positions.
-	 * If it is set to `false`, the Positions tab in the Account Manager will be hidden.
+	 * Enables positions.
+	 * This flag requires the {@link IBrokerTerminal.positions} method to be implemented.
+	 * If you set `supportPositions` to `false`, the _Positions_ tab in the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md) will be hidden.
 	 * @default true
 	 */
 	supportPositions?: boolean;
 	/**
-	 * Broker supports brackets (take profit and stop loss orders) for positions.
-	 * If this flag is set to `true` the Chart will display an Edit button for positions and add `Edit position...` to the context menu of a position.
+	 * Enables position brackets: take-profit and stop-loss orders.
+	 * If you set `supportPositionBrackets` to `true`, the library displays an _Edit_ button for positions and _Edit position..._ in the position's context menu.
+	 * This flag requires the {@link IBrokerTerminal.editPositionBrackets} method to be implemented.
 	 * @default false
 	 */
 	supportPositionBrackets?: boolean;
 	/**
-	 * Broker supports brackets for trades (take profit and stop loss orders).
-	 * If this flag is set to `true` the Chart will display an Edit button for trades (individual positions) and add `Edit position...` to the context menu of a trade.
+	 * Enables brackets for individual positions: take-profit and stop-loss orders.
+	 * If you set this flag to `true`, the library displays an _Edit_ button for individual positions and _Edit position..._ in the individual position's context menu.
+	 * This flag requires the {@link IBrokerTerminal.editIndividualPositionBrackets} method to be implemented.
 	 * @default false
 	 */
-	supportTradeBrackets?: boolean;
+	supportIndividualPositionBrackets?: boolean;
 	/**
-	 * Broker supports individual positions (trades).
-	 * If it is set to `true`, there will be two tabs in the Account Manager - Individual Positions and Net Positions.
+	 * Enables individual and net positions.
+	 * If you set this flag to `true`, the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md) will have two tabs: _Individual Positions_ and _Net Positions_.
+	 * This flag requires the {@link IBrokerTerminal.individualPositions} method to be implemented.
+	 *
 	 * @default false
 	 */
-	supportTrades?: boolean;
+	supportPositionNetting?: boolean;
 	/**
-	 * Broker supports closing of a position.
-	 * If it is not supported by broker, Chart will have the close button, but it will place a closing order.
+	 * Enables position closing.
+	 * This flag requires the {@link IBrokerTerminal.closePosition} method to be implemented.
+	 * If `supportClosePosition` is set to `true`, the library displays a close button and calls the `closePosition` method.
+	 * If `supportClosePosition` is set to `false`, the library displays a close button but calls the {@link IBrokerTerminal.placeOrder} method with the `isClose` property set to `true`.
 	 * @default false
 	 */
 	supportClosePosition?: boolean;
 	/**
-	 * Individual positions (trades) can be closed.
+	 * Enables individual position closing.
+	 * This flag requires the {@link IBrokerTerminal.closeIndividualPosition} method to be implemented.
 	 * @default false
 	 */
-	supportCloseTrade?: boolean;
+	supportCloseIndividualPosition?: boolean;
 	/**
-	 * Using this flag you can disable existing order's price modification.
+	 * Enables order price editing.
+	 * If you set this flag to `false`, the price control in the _Order Ticket_ will be disabled when users modify orders.
 	 * @default true
 	 */
 	supportModifyOrderPrice?: boolean;
 	/**
-	 * Using this flag you can disable existing order's quantity modification.
+	 * Enables order quantity editing.
+	 * If you set this flag to `false`, the quantity control in the _Order Ticket_ will be disabled when users modify orders.
 	 * @default true
 	 */
 	supportEditAmount?: boolean;
 	/**
-	 * Using this flag you can disable existing order's brackets modification. If you set it to `false`,
-	 * additional fields will be disabled in Order Ticket on the chart,
-	 * and 'Modify' button will be hidden from the chart and in the Account Manager.
+	 * Enables order brackets editing.
+	 * If you set this flag to `false`, the bracket's control in the Order Ticket will be disabled,
+	 * and the _Modify_ button will be hidden from the chart and in the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md).
 	 * @default true
 	 */
 	supportModifyBrackets?: boolean;
 	/**
-	 * Level2 data is used for DOM widget. `subscribeDepth` and `unsubscribeDepth` should be implemented.
+	 * Enables Level 2 data for the Depth of Market (DOM) widget.
+	 * This flag requires the [`subscribeDepth`](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Datafeed-API#subscribedepth) and [`unsubscribeDepth`](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Datafeed-API#unsubscribedepth) methods to be implemented.
+	 * Note that you should also enable the {@link BrokerConfigFlags.supportDOM} flag to display the DOM widget in the UI.
 	 * @default false
 	 */
 	supportLevel2Data?: boolean;
 	/**
-	 * Does broker support Depth of Market.
+	 * Enables the Depth of Market (DOM) widget.
+	 * Note that you should also enable the {@link BrokerConfigFlags.supportLevel2Data} flag and implement the [`subscribeDepth`](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Datafeed-API#subscribedepth) and [`unsubscribeDepth`](https://www.tradingview.com/charting-library-docs/latest/connecting_data/Datafeed-API#unsubscribedepth) methods to provide Level 2 data for the DOM widget.
 	 * @default false
 	 */
 	supportDOM?: boolean;
 	/**
-	 * Supporting multiposition prevents creating the default implementation for a reversing position.
+	 * Enables multiple positions for one instrument at the same time.
+	 * Supporting multiple positions prevents creating the default implementation for a reversing position.
 	 * @default false
 	 */
 	supportMultiposition?: boolean;
 	/**
-	 * Broker provides PL for a position. If the broker calculates profit/loss by itself it should call `plUpdate` as soon as PL is changed.
-	 * Otherwise Chart will calculate PL as a difference between the current trade and an average price of the position.
+	 * Allows you to use your own Profit & Loss (P&L) values for positions.
+	 * If `supportPLUpdate` is set to `true`, you should call the {@link IBrokerConnectionAdapterHost.plUpdate} method as soon as P&L values are changed.
+	 * If `supportPLUpdate` is set to `false`, the library automatically calculates P&L values as the difference between the current trade and the average position price.
 	 * @default true
 	 */
 	supportPLUpdate?: boolean;
 	/**
-	 * Broker supports reversing of a position.
-	 * If it is not supported by broker, the reverse position button will be hidden.
+	 * Enables position reversing.
+	 * If `supportReversePosition` is set to `false`, the _Reverse Position_ button will be hidden from the UI.
 	 * @default false
 	 */
 	supportReversePosition?: boolean;
 	/**
-	 * Broker natively supports reversing of a position.
-	 * If it is not natively supported by broker, Chart will place a reversing order.
+	 * Enables native position reversing.
+	 * This flag requires the {@link IBrokerTerminal.reversePosition} method to be implemented.
+	 * If `supportNativeReversePosition` is set to `false`, the library expects you to place a reversing order via the {@link IBrokerTerminal.placeOrder} method.
 	 * @default false
 	 */
 	supportNativeReversePosition?: boolean;
 	/**
-	 * This flag adds market orders type to Order Ticket.
+	 * Enables market orders type in the Order Ticket.
 	 * @default true
 	 */
 	supportMarketOrders?: boolean;
 	/**
-	 * This flag adds limit orders type to Order Ticket.
+	 * Enables limit orders type in the Order Ticket.
 	 * @default true
 	 */
 	supportLimitOrders?: boolean;
 	/**
-	 * This flag adds stop orders type to Order Ticket.
+	 * Enables stop orders type in the Order Ticket.
 	 * @default true
 	 */
 	supportStopOrders?: boolean;
 	/**
-	 * This flag adds stop-limit orders type to Order Ticket.
+	 * Enables stop-limit orders type in the Order Ticket.
 	 * @default false
 	 */
 	supportStopLimitOrders?: boolean;
 	/**
-	 * Does broker support demo live switcher.
+	 * Enables demo live switcher.
 	 * @default true
 	 */
 	supportDemoLiveSwitcher?: boolean;
 	/**
-	 * Using this flag you can disable brackets for market orders.
+	 * Enables brackets for market orders.
 	 * @default true
 	 */
 	supportMarketBrackets?: boolean;
 	/**
-	 * Broker supports symbol search
+	 * Enables symbol searching.
 	 * @default false
 	 */
 	supportSymbolSearch?: boolean;
 	/**
-	 * Using this flag you can enable modification of the duration of the existing order.
+	 * Allows modifying existing [order duration](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/order-ticket.md#set-order-duration).
 	 * @default false
 	 */
 	supportModifyDuration?: boolean;
 	/**
-	 * Broker supports modifying trailing stop orders.
+	 * Allows modifying trailing stop orders.
 	 * @default true
 	 */
 	supportModifyTrailingStop?: boolean;
 	/**
-	 * Broker supports margin.
-	 * If the broker supports margin it should call `marginAvailableUpdate` ({@link IBrokerConnectionAdapterHost.marginAvailableUpdate}) when the Trading Platform subscribes using `subscribeMarginAvailable` ({@link IBrokerWithoutRealtime.subscribeMarginAvailable}).
+	 * Allows margin.
+	 * If `supportMargin` is set to `true`, you should call {@link IBrokerConnectionAdapterHost.marginAvailableUpdate} when the Trading Platform subscribes to margin available updates using {@link IBrokerWithoutRealtime.subscribeMarginAvailable}.
 	 * @default false
 	 */
 	supportMargin?: boolean;
 	/**
-	 * Calculate Profit / Loss using last value.
+	 * Enables Profit & Loss calculations using last value.
 	 * @default false
 	 */
 	calculatePLUsingLast?: boolean;
 	/**
-	 * Broker provides the estimated commission, fees, margin and other order information before placing the order without actually placing it.
+	 * Allows providing the estimated commission, fees, margin, and other order information before placing the order without actually placing it.
+	 * This information will be displayed in the _Order confirmation_ dialog.
+	 *
+	 * This flag requires the {@link IBrokerTerminal.previewOrder} method to be implemented and `confirmId` parameter to be passed in the {@link IBrokerTerminal.placeOrder} method.
+	 * Refer to [Enable order preview](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/order-ticket.md#add-custom-fields) for more information.
 	 * @default false
 	 */
 	supportPlaceOrderPreview?: boolean;
 	/**
-	 * Broker provides the estimated commission, fees, margin and other order information before modifying the order without actually modifying it.
+	 * Allows providing the estimated commission, fees, margin, and other order information before modifying the order without actually modifying it.
+	 * This information will be displayed in the _Order confirmation_ dialog.
+	 *
+	 * This flag requires the {@link IBrokerTerminal.previewOrder} method to be implemented and `confirmId` parameter to be passed in the {@link IBrokerTerminal.modifyOrder} method.
+	 * Refer to [Enable order preview](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/order-ticket.md#add-custom-fields) for more information.
 	 * @default false
 	 */
 	supportModifyOrderPreview?: boolean;
 	/**
-	 * Broker supports leverage. If the flag is set to `true`, broker will calculate leverage using `leverageInfo` ({@link IBrokerWithoutRealtime.leverageinfo}) method.
+	 * Enables trading with leverage.
+	 * If the flag is set to `true`, you should calculate the leverage using the {@link IBrokerWithoutRealtime.leverageInfo} method.
 	 * @default false
 	 */
 	supportLeverage?: boolean;
 	/**
-	 * Broker supports leverage button. If the flag is set to `true`, a leverage input field will appear in Order Ticket. Click on the input field will activate a dedicated Leverage Dialog.
+	 * Displays a leverage button in the UI.
+	 * Note that you should also enable the {@link BrokerConfigFlags.supportLeverage} flag.
+	 * If `supportLeverageButton` is set to `true`, the leverage input field appears in the Order Ticket.
+	 * Clicking the input field activates a dedicated Leverage Dialog.
 	 * @default true
 	 */
 	supportLeverageButton?: boolean;
 	/**
-	 * Broker supports orders history. If it is set to `true`, there will be an additional tab in the Account Manager - Orders History.
-	 * The `ordersHistory` method should be implemented. It should return a list of orders with the `filled`, `cancelled` and `rejected` statuses from previous trade sessions.
+	 * Enables orders history.
+	 * If `supportOrdersHistory` is set to `true`, the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md) will have an additional tab: _Orders History_.
+	 * This flag requires the {@link IBrokerTerminal.ordersHistory} method to be implemented.
+	 * The method should return a list of orders with the `filled`, `cancelled`, and `rejected` statuses from previous trade sessions.
 	 * @default false
 	 */
 	supportOrdersHistory?: boolean;
 	/**
-	 * Using this flag you can disable adding brackets to the existing order.
+	 * Enables adding brackets to the existing order.
 	 * @default true
 	 */
 	supportAddBracketsToExistingOrder?: boolean;
 	/**
-	 * Used for crypto currencies only. Allows to get crypto balances for an account. Balances are displayed as the first table of the Account Summary tab.
+	 * Allows getting crypto balances for an account.
+	 * Balances are displayed as the first table of the _Account Summary_ tab.
+	 * Use the flag for crypto currencies only.
+	 * This flag requires the {@link IBrokerConnectionAdapterHost.cryptoBalanceUpdate} method to be implemented.
 	 * @default false
 	 */
 	supportBalances?: boolean;
@@ -622,72 +650,81 @@ export interface BrokerConfigFlags {
 	 */
 	supportOnlyPairPositionBrackets?: boolean;
 	/**
-	 * Whether the account is used to exchange(trade) crypto currencies.
-	 * This flag switches Order Ticket to the Crypto Exchange mode. It adds second currency quantity control, currency labels etc.
+	 * Enables cryptocurrency trading (exchanging).
+	 * This flag switches the Order Ticket to Crypto Exchange mode,
+	 * which provides additional controls for entering the quantity in either the base or quote currency.
 	 * @default false
 	 */
 	supportCryptoExchangeOrderTicket?: boolean;
 	/**
-	 * With this flag you can show a checkbox to disable the confirmation dialog display
-	 * @default false
-	 */
-	supportConfirmations?: boolean;
-	/**
-	 * Using this flag you can display PL in instrument currency.
+	 * Enables displaying Profit & Loss values in instrument currency.
 	 * @default false
 	 */
 	positionPLInInstrumentCurrency?: boolean;
 	/**
-	 * Does broker support partial position closing
+	 * Enables partial position closing.
+	 * This flag requires the {@link IBrokerTerminal.closePosition} method to be implemented.
 	 * @default false
 	 */
 	supportPartialClosePosition?: boolean;
 	/**
-	 * Does broker support partial trade closing
+	 * Enables partial individual position closing.
+	 * This flag requires the {@link IBrokerTerminal.closeIndividualPosition} method to be implemented.
 	 * @default false
 	 */
-	supportPartialCloseTrade?: boolean;
+	supportPartialCloseIndividualPosition?: boolean;
 	/**
-	 * Cancelling a bracket (take profit or stop loss) cancels its pair.
+	 * Modifies the confirmation dialog text for closing a bracket order.
+	 * When set to `true`, the text explicitly states that cancelling a bracket order will also cancel its associated pair.
+	 * When set to `false`, the text will include the ID of the singular bracket order being cancelled.
+	 *
+	 * Note that the library does not cancel orders itself.
+	 * You should implement the {@link IBrokerTerminal.cancelOrder} or {@link IBrokerTerminal.cancelOrders } method.
 	 * @default false
 	 */
 	supportCancellingBothBracketsOnly?: boolean;
 	/**
-	 * Does broker support crypto brackets
+	 * Enables crypto brackets.
 	 * @default false
 	 */
 	supportCryptoBrackets?: boolean;
 	/**
-	 * Using this flag you can show/hide the `Notifications log` tab in the account manager.
+	 * Enables the _Notifications log_ tab in the [Account Manager](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/account-manager.md).
 	 * @default true
 	 */
 	showNotificationsLog?: boolean;
 	/**
-	 * Whether stop orders should behave like Market-if-touched in both directions.
+	 * Whether stop orders should behave like Market-if-Touched in both directions.
 	 * Enabling this flag prevents the check of stop price direction from the stop limit Order Ticket.
 	 * @default false
 	 */
 	supportStopOrdersInBothDirections?: boolean;
 	/**
+	 * Whether stop-limit orders should behave like Limit-if-Touched in both directions.
 	 * Enabling this flag prevents the check of stop price direction from the stop limit Order Ticket.
 	 */
 	supportStopLimitOrdersInBothDirections?: boolean;
 	/**
-	 * Broker supports executions.
-	 * If this flag is set to `true` the Chart will display executions.
+	 * Whether the integration supports limit price validation in the order ticket to eliminate the possibility to place
+	 * an order on the wrong side of the market that will most likely trigger and get filled immediately.
+	 */
+	supportStrictCheckingLimitOrderPrice?: boolean;
+	/**
+	 * Enables executions.
+	 * This flag requires the {@link IBrokerTerminal.executions} method to be implemented.
 	 * @default false
 	 */
 	supportExecutions?: boolean;
 	/**
-	 * Does broker support modifying order type
+	 * Allows modifying order type.
 	 * @default false
 	 */
 	supportModifyOrderType?: boolean;
 	/**
-	 * Trading account requires closing of trades in FIFO order.
+	 * Enables closing of individual positions in FIFO order.
 	 * @default false
 	 */
-	requiresFIFOCloseTrades?: boolean;
+	requiresFIFOCloseIndividualPositions?: boolean;
 }
 export interface BrokerCustomUI {
 	/**
@@ -698,11 +735,11 @@ export interface BrokerCustomUI {
 	showOrderDialog?: (order: OrderTemplate | Order, focus?: OrderTicketFocusControl) => Promise<boolean>;
 	/**
 	 * Shows the Position Dialog
-	 * @param  {Position|Trade} position - position to be placed or modified
+	 * @param  {Position|IndividualPosition} position - position to be placed or modified
 	 * @param  {Brackets} brackets - brackets for the position
 	 * @param  {OrderTicketFocusControl} [focus] - Control to focus on when dialog is opened
 	 */
-	showPositionDialog?: (position: Position | Trade, brackets: Brackets, focus?: OrderTicketFocusControl) => Promise<boolean>;
+	showPositionDialog?: (position: Position | IndividualPosition, brackets: Brackets, focus?: OrderTicketFocusControl) => Promise<boolean>;
 	/**
 	 * Shows a confirmation dialog and executes handler if YES/OK is pressed.
 	 * @param  {Order} order - order to be cancelled
@@ -846,7 +883,8 @@ export interface ErrorFormatterParseResult extends FormatterParseResult {
 	res: false;
 }
 /**
- * Describes a single execution. Execution is a mark on a chart that displays trade information.
+ * Describes a single execution.
+ * Execution is when a buy or sell order is completed for a financial instrument.
  */
 export interface Execution extends CustomFields {
 	/** Symbol name */
@@ -879,11 +917,16 @@ export interface IBoxedValueReadOnly<T> {
 	/** Value */
 	value(): T;
 }
+export interface IBrokerAccountInfo {
+	accountsMetainfo(): Promise<AccountMetainfo[]>;
+	currentAccount(): AccountId;
+	setCurrentAccount?(id: AccountId): void;
+}
 export interface IBrokerCommon {
 	/**
 	 * Chart can have a sub-menu `Trading` in the context menu. This method should return an array of {@link ActionMetaInfo} elements, each of them representing one context menu item.
 	 * @param  {TradeContext} context - context object passed by a browser
-	 * @param  {DefaultContextMenuActionsParams} options? - default options for the context menu action parameters
+	 * @param  {DefaultContextMenuActionsParams} [options] - default options for the context menu action parameters
 	 */
 	chartContextMenuActions(context: TradeContext, options?: DefaultContextMenuActionsParams): Promise<ActionMetaInfo[]>;
 	/**
@@ -910,17 +953,19 @@ export interface IBrokerCommon {
 	 * This method is called by the Trading Platform to request orders history.
 	 * It is expected that returned orders will have a final status (`rejected`, `filled`, `cancelled`).
 	 *
-	 * This method is optional. If you don't support orders history, please set `supportOrdersHistory` flag to `false`.
+	 * This method is optional. If you don't support orders history, please set the {@link BrokerConfigFlags.supportOrdersHistory} flag to `false`.
 	 */
 	ordersHistory?(): Promise<Order[]>;
 	/**
-	 * Called by Trading Platform to request positions
+	 * Called by Trading Platform to request positions.
+	 * Required if the {@link BrokerConfigFlags.supportPositions} flag is set to `true`.
 	 */
 	positions?(): Promise<Position[]>;
 	/**
-	 * Called by Trading Platform to request trades
+	 * Called by Trading Platform to request individual positions.
+	 * Required if the {@link BrokerConfigFlags.supportPositionNetting} flag is set to `true`.
 	 */
-	trades?(): Promise<Trade[]>;
+	individualPositions?(): Promise<IndividualPosition[]>;
 	/**
 	 * Called by Trading Platform to request executions for the specified symbol
 	 * @param  {string} symbol - symbol identifier
@@ -952,7 +997,7 @@ export interface IBrokerCommon {
 	 */
 	quantityFormatter?(symbol: string): Promise<INumberFormatter>;
 	/**
-	 * Implement this method if you use the standard Order dialog and want to customize it.
+	 * Implement this method if you want to [add custom fields](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/order-ticket.md#add-custom-fields) to the standard Order Ticket.
 	 *
 	 * Use the `symbol` parameter to return customization options for a particular symbol.
 	 * @param  {string} symbol - symbol identifier
@@ -962,6 +1007,11 @@ export interface IBrokerCommon {
 	 * Implement this method if you want to customize the position dialog.
 	 */
 	getPositionDialogOptions?(): PositionDialogOptions | undefined;
+	/**
+	 * Implement this method if you want to have custom options available for different symbols.
+	 * @param  {string} symbol - symbol identifier
+	 */
+	getSymbolSpecificTradingOptions?(symbol: string): Promise<SymbolSpecificTradingOptions | undefined>;
 }
 export interface IBrokerConnectionAdapterFactory {
 	/** Creates a Delegate object */
@@ -979,8 +1029,9 @@ export interface IBrokerConnectionAdapterFactory {
 	createPriceFormatter(priceScale?: number, minMove?: number, fractional?: boolean, minMove2?: number, variableMinTick?: string): IPriceFormatter;
 }
 /**
- * Trading Host is an API for interaction between the Broker API and the Chart Trading Subsystem.
- * Its main purpose is to exchange information between our charts and your trading adapter.
+ * The Trading Host is an API for interaction between the Broker API and the library code related to trading.
+ * Its main purpose is to receive information from your backend server where trading logic is implemented and provide updates to the library.
+ * Refer to the [Core trading concepts](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/trading-concepts/trading-concepts.md) article for more information.
  */
 export interface IBrokerConnectionAdapterHost {
 	/** Broker Connection Adapter Factory object */
@@ -1056,17 +1107,17 @@ export interface IBrokerConnectionAdapterHost {
 	 */
 	positionPartialUpdate(id: string, positionChanges: Partial<Position>): void;
 	/**
-	 * Call this method when a trade is added or changed.
-	 * @param  {Trade} trade - updated trade
+	 * Call this method when an individual position is added or changed.
+	 * @param  {IndividualPosition} individualPosition - updated individual position
 	 * @param  {boolean} [isHistoryUpdate] - whether the change is a history update
 	 */
-	tradeUpdate(trade: Trade, isHistoryUpdate?: boolean): void;
+	individualPositionUpdate(individualPosition: IndividualPosition, isHistoryUpdate?: boolean): void;
 	/**
-	 * Call this method when a trade has not changed, but fields that you added to the trade object to display in the Account Manager have changed.
-	 * @param  {string} id - id of the updated trade
-	 * @param  {Partial<Trade>} tradeChanges - changes to the trade object
+	 * Call this method when an individual position has not changed, but fields that you added to the individual position object to display in the Account Manager have changed.
+	 * @param  {string} id - ID of the updated individual position
+	 * @param  {Partial<IndividualPosition>} changes - changes to the individual position object
 	 */
-	tradePartialUpdate(id: string, tradeChanges: Partial<Trade>): void;
+	individualPositionPartialUpdate(id: string, changes: Partial<IndividualPosition>): void;
 	/**
 	 * Call this method when an execution is added.
 	 * @param  {Execution} execution - execution which was added
@@ -1083,8 +1134,9 @@ export interface IBrokerConnectionAdapterHost {
 	 */
 	realtimeUpdate(symbol: string, data: TradingQuotes): void;
 	/**
-	 * Call this method when a broker connection has received a PL update. This method should be used when `supportPLUpdate` flag is set in `configFlags`.
-	 * @param  {string} positionId - id of the position
+	 * Call this method when a broker connection has received a PL update.
+	 * Use this method when the {@link BrokerConfigFlags.supportPLUpdate} flag is set to `true` in {@link SingleBrokerMetaInfo.configFlags}.
+	 * @param  {string} positionId - ID of the position
 	 * @param  {number} pl - updated profit / loss value
 	 */
 	plUpdate(positionId: string, pl: number): void;
@@ -1096,11 +1148,11 @@ export interface IBrokerConnectionAdapterHost {
 	 */
 	pipValueUpdate(symbol: string, pipValues: PipValues): void;
 	/**
-	 * Call this method when a broker connection has received a trade PL update.
-	 * @param  {string} tradeId - id of the trade
-	 * @param  {number} pl - updated profit / loss for the trade
+	 * Call this method when a broker connection has received an individual position PL update.
+	 * @param  {string} individualPositionId - ID of the individual position
+	 * @param  {number} pl - updated profit / loss for the individual position
 	 */
-	tradePLUpdate(tradeId: string, pl: number): void;
+	individualPositionPLUpdate(individualPositionId: string, pl: number): void;
 	/**
 	 * Call this method when a broker connection has received an equity update. This method is required by the standard Order Dialog to calculate risks.
 	 * @param  {number} equity - updated equity
@@ -1109,7 +1161,7 @@ export interface IBrokerConnectionAdapterHost {
 	/**
 	 * Call this method when a broker connection has received a margin available update.
 	 * This method is required by the standard Order Dialog to display the margin meter.
-	 * This method should be used when `supportMargin` flag is set in `configFlags`.
+	 * This method should be used when {@link BrokerConfigFlags.supportMargin} is set to `true` in {@link SingleBrokerMetaInfo.configFlags}.
 	 * The Trading Platform subscribes to margin available updates using {@link IBrokerWithoutRealtime.subscribeMarginAvailable}.
 	 * @param  {number} marginAvailable - updated available margin
 	 */
@@ -1117,8 +1169,8 @@ export interface IBrokerConnectionAdapterHost {
 	/**
 	 * Call this method when a broker connection has received a balance update.
 	 * This method is required by the crypto Order Dialog.
-	 * It should be implemented when `supportBalances` flag is set in `configFlags`.
-	 * @param  {string} symbol - symbol id
+	 * It should be implemented when the {@link BrokerConfigFlags.supportBalances} flag is set to `true` in {@link SingleBrokerMetaInfo.configFlags}.
+	 * @param  {string} symbol - symbol ID
 	 * @param  {CryptoBalance} balance - updated crypto balance
 	 */
 	cryptoBalanceUpdate(symbol: string, balance: CryptoBalance): void;
@@ -1129,16 +1181,43 @@ export interface IBrokerConnectionAdapterHost {
 	 */
 	domUpdate(symbol: string, equity: DOMData): void;
 	/**
+	 * Sets the quantity for a given symbol.
+	 * @param  {string} symbol - symbol
+	 * @param  {number} quantity - quantity to update
+	 */
+	setQty(symbol: string, quantity: number): void;
+	/**
+	 * Returns the quantity for a given symbol.
+	 * @param  {string} symbol - symbol
+	 * @return  {Promise<number>} - quantity for the given symbol
+	 */
+	getQty(symbol: string): Promise<number>;
+	/**
+	 * Adds a callback to be executed whenever there's a change of quantity for a given symbol.
+	 *
+	 * It's the user's responsibility to manage the unsubscription of any added listener
+	 *
+	 * @param  {string} symbol - symbol to which the callback will be linked to
+	 * @param  {SuggestedQtyChangedListener} listener - callback
+	 */
+	subscribeSuggestedQtyChange(symbol: string, listener: SuggestedQtyChangedListener): void;
+	/**
+	 * Remove a previously added callback from the list.
+	 * @param  {string} symbol - symbol to remove the callback from
+	 * @param  {SuggestedQtyChangedListener} listener - callback to be removed
+	 */
+	unsubscribeSuggestedQtyChange(symbol: string, listener: SuggestedQtyChangedListener): void;
+	/**
 	 * Shows the order dialog
 	 * @param  {T extends PreOrder} order - order to show in the dialog
-	 * @param  {OrderTicketFocusControl} focus? - input control to focus on when dialog is opened
+	 * @param  {OrderTicketFocusControl} [focus] - input control to focus on when dialog is opened
 	 */
 	showOrderDialog?<T extends PreOrder>(order: T, focus?: OrderTicketFocusControl): Promise<boolean>;
 	/**
 	 * Shows notification message
 	 * @param  {string} title - notification title
 	 * @param  {string} text - notification content
-	 * @param  {NotificationType} notificationType? - type of notification (default: NotificationType.Error)
+	 * @param  {NotificationType} [notificationType] - type of notification (default: NotificationType.Error)
 	 */
 	showNotification(title: string, text: string, notificationType?: NotificationType): void;
 	/**
@@ -1175,16 +1254,11 @@ export interface IBrokerConnectionAdapterHost {
 	showReversePositionDialog(position: string, handler: () => Promise<boolean>): Promise<boolean>;
 	/**
 	 * Shows the position brackets dialog
-	 * @param  {Position|Trade} position - position or trade
-	 * @param  {Brackets} brackets - brackets for the position or trade
+	 * @param  {Position|IndividualPosition} position - position or individual position
+	 * @param  {Brackets} brackets - brackets for the position or individual position
 	 * @param  {OrderTicketFocusControl} focus - input control to focus on when dialog is opened
 	 */
-	showPositionBracketsDialog(position: Position | Trade, brackets: Brackets, focus: OrderTicketFocusControl): Promise<boolean>;
-	/**
-	 * Bottom Trading Panel has a button with a list of dropdown items. This method can be used to replace existing items.
-	 * @param  {ActionMetaInfo[]} descriptions - Descriptions for the dropdown items.
-	 */
-	setButtonDropdownActions(descriptions: ActionMetaInfo[]): void;
+	showPositionBracketsDialog(position: Position | IndividualPosition, brackets: Brackets, focus: OrderTicketFocusControl): Promise<boolean>;
 	/**
 	 * Activate bottom widget
 	 */
@@ -1202,7 +1276,7 @@ export interface IBrokerConnectionAdapterHost {
 	 * Displays a message dialog to a user.
 	 * @param  {string} title - title of the message dialog
 	 * @param  {string} text - message
-	 * @param  {boolean} textHasHTML? - whether message text contains HTML
+	 * @param  {boolean} [textHasHTML] - whether message text contains HTML
 	 */
 	showMessageDialog(title: string, text: string, textHasHTML?: boolean): void;
 	/**
@@ -1236,7 +1310,12 @@ export interface IBrokerTerminal extends IBrokerWithoutRealtime {
 	 */
 	unsubscribeRealtime(symbol: string): void;
 }
-export interface IBrokerWithoutRealtime extends IBrokerCommon {
+/**
+ * The Broker API is a key component that enables trading.
+ * Its main purpose is to connect TradingView charts with your trading logic.
+ * Refer to the [Core trading concepts](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/trading-concepts/trading-concepts.md) article for more information.
+ */
+export interface IBrokerWithoutRealtime extends IBrokerCommon, IBrokerAccountInfo {
 	/**
 	 * Library is requesting that realtime DOM (Depth of Market) updates should be supplied for this symbol
 	 * @param  {string} symbol - symbol identifier
@@ -1248,71 +1327,100 @@ export interface IBrokerWithoutRealtime extends IBrokerCommon {
 	 */
 	unsubscribeDOM?(symbol: string): void;
 	/**
-	 * Method is called when a user wants to place an order. Order is pre-filled with partial or complete information. This function returns an object with the order id.
+	 * Method is called when a user wants to place an order.
+	 * Order is pre-filled with partial or complete information.
+	 * This function returns an object with the order ID.
+	 * To enable order preview before placing it, set {@link BrokerConfigFlags.supportPlaceOrderPreview} to `true`.
 	 * @param  {PreOrder} order - order information
-	 * @param  {string} [confirmId] - is passed if `supportPlaceOrderPreview` configuration flag is on.
+	 * @param  {string} [confirmId] - is passed if the `supportPlaceOrderPreview` configuration flag is on.
 	 * @returns PlaceOrderResult, which should include an `orderId`
 	 */
 	placeOrder(order: PreOrder, confirmId?: string): Promise<PlaceOrderResult>;
 	/**
-	 * Returns estimated commission, fees, margin and other information for the order without it actually being placed.
-	 * The method is called if `supportPlaceOrderPreview` configuration flag is on.
+	 * Returns estimated commission, fees, margin, and other information for the order without it actually being placed.
+	 * The method is called if the {@link BrokerConfigFlags.supportPlaceOrderPreview} or {@link BrokerConfigFlags.supportModifyOrderPreview} configuration flag is on.
 	 * @param  {PreOrder} order - order information
 	 */
 	previewOrder?(order: PreOrder): Promise<OrderPreviewResult>;
 	/**
 	 * Method is called when a user wants to modify an existing order.
+	 *
+	 * Note that the library expects you to call the {@link IBrokerConnectionAdapterHost.orderUpdate} method right afterwards.
+	 * Otherwise, the library will return a [timeout issue](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/common-issues.md#timeout-issue).
+	 *
+	 * To enable order preview before modifying it, set {@link BrokerConfigFlags.supportModifyOrderPreview} to `true`.
 	 * @param  {Order} order - order information
-	 * @param  {string} [confirmId] - is passed if `supportPlaceOrderPreview` configuration flag is on.
+	 * @param  {string} [confirmId] - is passed if `supportModifyOrderPreview` configuration flag is on.
 	 */
 	modifyOrder(order: Order, confirmId?: string): Promise<void>;
 	/**
 	 * This method is called to cancel a single order with the given `id`.
-	 * @param  {string} orderId - id for the order to cancel
+	 *
+	 * Note that the library expects you to call the {@link IBrokerConnectionAdapterHost.orderUpdate} method right afterwards.
+	 * @param  {string} orderId - ID for the order to cancel
 	 */
 	cancelOrder(orderId: string): Promise<void>;
 	/**
 	 * This method is called to cancel multiple orders for a `symbol` and `side`.
+	 * The `ordersIds` parameter should contain the list of order ids to be cancelled.
 	 *
-	 * `ordersIds` parameter should contain the list of order ids to be cancelled.
+	 * Note that the library expects you to call the {@link IBrokerConnectionAdapterHost.orderUpdate} method right afterwards.
 	 * @param  {string} symbol - symbol identifier
 	 * @param  {Side|undefined} side - order side
 	 * @param  {string[]} ordersIds - ids already collected by `symbol` and `side`
 	 */
 	cancelOrders(symbol: string, side: Side | undefined, ordersIds: string[]): Promise<void>;
 	/**
-	 * This method is called if `supportNativeReversePosition` configuration flag is on. It allows to reverse the position by id.
+	 * This method is called if the {@link BrokerConfigFlags.supportNativeReversePosition} configuration flag is on.
+	 * It allows reversing the position by ID.
+	 *
+	 * Note that the library expects you to call the {@link IBrokerConnectionAdapterHost.positionUpdate} method right afterwards.
+	 * Otherwise, the library will return a [timeout issue](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/common-issues.md#timeout-issue).
 	 * @param  {string} positionId - position
 	 */
 	reversePosition?(positionId: string): Promise<void>;
 	/**
-	 * This method is called if `supportClosePosition` configuration flag is on. It allows to close the position by id.
-	 * @param  {string} positionId - position id
+	 * This method is called if the {@link BrokerConfigFlags.supportClosePosition} or {@link BrokerConfigFlags.supportPartialClosePosition} configuration flag is on.
+	 * It allows closing the position by ID.
+	 *
+	 * Note that the library expects you to call the {@link IBrokerConnectionAdapterHost.positionUpdate} method right afterwards.
+	 * Otherwise, the library will return a [timeout issue](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/common-issues.md#timeout-issue).
+	 * @param  {string} positionId - Position ID.
 	 * @param  {number} [amount] - The amount is specified if `supportPartialClosePosition` is `true` and the user wants to close only part of the position.
 	 */
 	closePosition?(positionId: string, amount?: number): Promise<void>;
 	/**
-	 * This method is called if `supportCloseTrade` configuration flag is on. It allows to close the trade by id.
-	 * @param  {string} tradeId - trade id
-	 * @param  {number} [amount] - The amount is specified if `supportPartialCloseTrade` is `true` and the user wants to close only part of the trade.
+	 * This method is called if the {@link BrokerConfigFlags.supportCloseIndividualPosition} or {@link BrokerConfigFlags.supportPartialCloseIndividualPosition} configuration flag is on.
+	 * It allows closing the individual position by ID.
+	 *
+	 * Note that the library expects you to call the {@link IBrokerConnectionAdapterHost.positionUpdate} method right afterwards.
+	 * Otherwise, the library will return a [timeout issue](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/common-issues.md#timeout-issue).
+	 * @param  {string} individualPositionId - Individual position ID.
+	 * @param  {number} [amount] - The amount is specified if `supportPartialCloseIndividualPosition` is `true` and the user wants to close only part of the individual position.
 	 */
-	closeTrade?(tradeId: string, amount?: number): Promise<void>;
+	closeIndividualPosition?(individualPositionId: string, amount?: number): Promise<void>;
 	/**
-	 * This method is called if `supportPositionBrackets` configuration flag is on. It shows a dialog that enables `take profit` and `stop loss` editing.
+	 * This method is called if the {@link BrokerConfigFlags.supportPositionBrackets} configuration flag is on.
+	 * It shows a dialog that enables take-profit and stop-loss editing.
+	 *
+	 * Note that the library expects you to call the {@link IBrokerConnectionAdapterHost.positionUpdate} method right afterwards.
 	 * @param  {string} positionId - is an ID of an existing position to be modified
 	 * @param  {Brackets} brackets - new Brackets to be set for the position
 	 * @param  {CustomInputFieldsValues} [customFields] - custom fields to display in the dialog
 	 */
 	editPositionBrackets?(positionId: string, brackets: Brackets, customFields?: CustomInputFieldsValues): Promise<void>;
 	/**
-	 * This method is called if `supportTradeBrackets` configuration flag is on. It displays a dialog that enables take profit and stop loss editing.
-	 * @param  {string} tradeId - ID of existing trade to be modified
-	 * @param  {Brackets} brackets - new Brackets to be set for the trade
+	 * This method is called if the {@link BrokerConfigFlags.supportIndividualPositionBrackets} configuration flag is on.
+	 * It displays a dialog that enables take-profit and stop-loss editing.
+	 *
+	 * Note that the library expects you to call the {@link IBrokerConnectionAdapterHost.positionUpdate} method right afterwards.
+	 * @param  {string} individualPositionId - ID of existing individual position to be modified
+	 * @param  {Brackets} brackets - new Brackets to be set for the individual position
 	 */
-	editTradeBrackets?(tradeId: string, brackets: Brackets): Promise<void>;
+	editIndividualPositionBrackets?(individualPositionId: string, brackets: Brackets): Promise<void>;
 	/**
 	 * This method is called to receive leverageInfo from the broker.
-	 * @param  {LeverageInfoParams} leverageInfoParams - information about the specific symbol to provide leverage info for
+	 * @param  {LeverageInfoParams} leverageInfoParams - information about the specific symbol to provide leverage information for
 	 */
 	leverageInfo?(leverageInfoParams: LeverageInfoParams): Promise<LeverageInfo>;
 	/**
@@ -1411,7 +1519,7 @@ export interface IPriceFormatter extends ISymbolValueFormatter {
 	/**
 	 * Price Formatter
 	 * @param  {number} price - price
-	 * @param  {boolean} signPositive? - add plus sign to result string.
+	 * @param  {boolean} [signPositive] - add plus sign to result string.
 	 * @param  {number} [tailSize] - add `tailSize` digits to fractional part of result string
 	 * @param  {boolean} [signNegative] - add minus sign to result string.
 	 * @param  {boolean} [useRtlFormat] - Use Right to left format
@@ -1505,7 +1613,7 @@ export interface IWatchedValue<T> extends IWatchedValueReadonly<T>, IObservableV
 	/**
 	 * Set value for the watched value
 	 * @param  {T} value - value to set
-	 * @param  {boolean} forceUpdate? - force an update
+	 * @param  {boolean} [forceUpdate] - force an update
 	 */
 	setValue(value: T, forceUpdate?: boolean): void;
 	/** @inheritDoc */
@@ -1531,6 +1639,25 @@ export interface IWatchedValueReadonly<T> extends IObservableValueReadOnly<T> {
 	 */
 	when(callback: WatchedValueCallback<T>): void;
 }
+export interface IndividualPosition extends IndividualPositionBase, CustomFields {
+}
+/**
+ * Describes an individual position.
+ */
+export interface IndividualPositionBase {
+	/** Individual position ID. Usually id should be equal to brokerSymbol */
+	id: string;
+	/** Individual position open date (UNIX timestamp in milliseconds) */
+	date: number;
+	/** Symbol name */
+	symbol: string;
+	/** Individual position Quantity */
+	qty: number;
+	/** Individual position Side */
+	side: Side;
+	/** Individual position price */
+	price: number;
+}
 export interface InstrumentInfo {
 	/** Quantity field step and boundaries */
 	qty: QuantityMetainfo;
@@ -1554,6 +1681,10 @@ export interface InstrumentInfo {
 	domVolumePrecision?: number;
 	/** Leverage */
 	leverage?: string;
+	/**
+	 * The margin requirement for the instrument. A 3% margin rate should be represented as 0.03.
+	 */
+	marginRate?: number;
 	/** Minimal price change for limit price field of the Limit and Stop Limit order. If set it will override the `minTick` value. */
 	limitPriceStep?: number;
 	/** Minimal price change for stop price field of the Stop and Stop Limit order. If set it will override the `minTick` value. */
@@ -1577,6 +1708,8 @@ export interface InstrumentInfo {
 	bigPointValue?: number;
 	/** The value represents how much price is multiplied in relation to base monetary unit. */
 	priceMagnifier?: number;
+	/** Supported order types for the instrument */
+	allowedOrderTypes?: OrderType[];
 }
 /** Show a custom message with the reason why the symbol cannot be traded */
 export interface IsTradableResult {
@@ -1703,7 +1836,7 @@ export interface OpenUrlSolution {
 }
 export interface OrderDialogOptions extends TradingDialogOptions {
 	/**
-	 * Using this flag you can change `Trade Value` to `Total` in the Order Info section of the Order dialog.
+	 * Using this flag, you can change `Trade Value` to `Total` in the *Order Info* section of the [Order Ticket](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/order-ticket.md).
 	 */
 	showTotal?: boolean;
 }
@@ -1716,7 +1849,8 @@ export interface OrderDuration {
 	datetime?: number;
 }
 /**
- * Expiration options for orders
+ * Order duration options that determine how long the order remains active.
+ * Refer to [Set order duration](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/order-ticket.md#set-order-duration) for more information.
  */
 export interface OrderDurationMetaInfo {
 	/** If it is set to `true`, then the Display date control in Order Ticket for this duration type will be displayed. */
@@ -1779,8 +1913,8 @@ export interface OrderRule {
 	severity: "warning" | "error";
 }
 /**
- * Input value of the order ticket
- * This info is not sufficient to place an order
+ * Input value of the Order Ticket.
+ * This information is not sufficient to place an order.
  */
 export interface OrderTemplate {
 	/** Symbol identifier */
@@ -1821,7 +1955,7 @@ export interface PlaceOrderResult {
 export interface PlacedOrder extends PlacedOrderBase, CustomFields {
 }
 /**
- * Info about a placed order
+ * An object that contains information about a placed order.
  */
 export interface PlacedOrderBase {
 	/** Order ID */
@@ -1894,8 +2028,8 @@ export interface PositiveBaseInputFieldValidatorResult extends BaseInputFieldVal
 	valid: true;
 }
 /**
- * Output value of the order ticket and input value of the broker's place order command
- * This info is sufficient to place an order
+ * Output value of the Order Ticket and input value of the broker's place order command.
+ * This information is sufficient to place an order.
  */
 export interface PreOrder extends OrderTemplate {
 	/** @inheritDoc */
@@ -1944,13 +2078,13 @@ export interface SingleBrokerMetaInfo {
 	 */
 	customNotificationFields?: string[];
 	/**
-	 * List of expiration options of orders. It is optional. Do not set it if you don't want the durations to be displayed in Order Ticket.
+	 * List of order duration options that determine how long the order remains active.
+	 * Specifying `durations` enables a drop-down menu in the Order Ticket for supported orders.
+	 * Refer to [Set order duration](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/order-ticket.md#set-order-duration) for more information.
 	 *
 	 * The objects have the following keys: `{ name, value, hasDatePicker?, hasTimePicker?, default?, supportedOrderTypes? }`.
 	 */
 	durations?: OrderDurationMetaInfo[];
-	/** Dialog options for Positions (order type) */
-	positionDialogOptions?: PositionDialogOptions;
 	/**
 	 * Order Rules
 	 */
@@ -1965,7 +2099,7 @@ export interface SingleBrokerMetaInfo {
 	 * ```ts
 	 * customUI: {
 	 *     showOrderDialog?: (order: Order, focus?: OrderTicketFocusControl) => Promise<boolean>;
-	 *     showPositionDialog?: (position: Position | Trade, brackets: Brackets, focus?: OrderTicketFocusControl) => Promise<boolean>;
+	 *     showPositionDialog?: (position: Position | IndividualPosition, brackets: Brackets, focus?: OrderTicketFocusControl) => Promise<boolean>;
 	 *     showCancelOrderDialog?: (order: Order) => Promise<boolean>;
 	 *     showClosePositionDialog?: (position: Position) => Promise<boolean>;
 	 * }
@@ -1979,6 +2113,10 @@ export interface SortingParameters {
 	/** Ascending sorting order (default `true`) - If it is `false`, then initial sorting will be in descending order */
 	asc?: boolean;
 }
+/**
+ * The interface that describes the mapping of values in the {@link AccountManagerColumnBase.formatter} and {@link AccountManagerColumnBase.dataFields} properties of the Account Manager columns.
+ * Refer to the [Value formatters](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/account-manager/value-formatters.md) section for more information.
+ */
 /* eslint-disable jsdoc/require-jsdoc */
 export interface StandardFormattersDependenciesMapping {
 	[StandardFormatterName.Default]: string[];
@@ -2067,6 +2205,45 @@ export interface SuccessFormatterParseResult<T> extends FormatterParseResult {
 	/** Optional value returned by the default formatter */
 	suggest?: string;
 }
+export interface SymbolSpecificTradingOptions {
+	/** Array of strings with valid duration values. You can check that in Order Ticket. */
+	allowedDurations?: string[];
+	/** Supported order types for the instrument. */
+	allowedOrderTypes?: OrderType[];
+	/**
+	 * Whether order brackets are supported for the symbol.
+	 * Defaults to the value in the config.
+	 */
+	supportOrderBrackets?: boolean;
+	/**
+	 * Using this flag you can disable adding brackets to the existing order.
+	 */
+	supportAddBracketsToExistingOrder?: boolean;
+	/**
+	 * Using this flag you can disable existing order's brackets modification. If you set it to `false`,
+	 * additional fields will be disabled in Order Ticket on the chart,
+	 */
+	supportModifyBrackets?: boolean;
+	/**
+	 * Whether position brackets are supported for the symbol.
+	 * Defaults to the value in the config.
+	 */
+	supportPositionBrackets?: boolean;
+	/**
+	 * Whether trade brackets are supported for the symbol.
+	 * Defaults to the value in the config.
+	 */
+	supportIndividualPositionBrackets?: boolean;
+	/**
+	 * Whether position reversing is supported for the symbol.
+	 * Defaults to the value in the config.
+	 */
+	supportReversePosition?: boolean;
+	/**
+	 * A symbol-specific message that can be used to warn users.
+	 */
+	warningMessage?: string;
+}
 export interface TableFormatterInputs<T extends TableFormatterInputValues = TableFormatterInputValues> {
 	/** Array of values to be formatted. Values are obtained by extracting dependent properties from the data object. */
 	values: T extends [
@@ -2106,25 +2283,6 @@ export interface TextWithCheckboxValue {
 	/** Whether the checkbox is checked */
 	checked: boolean;
 }
-export interface Trade extends TradeBase, CustomFields {
-}
-/**
- * Describes a single trade (individual position).
- */
-export interface TradeBase {
-	/** Trade ID. Usually id should be equal to brokerSymbol */
-	id: string;
-	/** Trade date (UNIX timestamp in milliseconds) */
-	date: number;
-	/** Symbol name */
-	symbol: string;
-	/** Trade Quantity */
-	qty: number;
-	/** Trade Side */
-	side: Side;
-	/** Trade price */
-	price: number;
-}
 export interface TradeContext {
 	/** Symbol name */
 	symbol: string;
@@ -2138,7 +2296,8 @@ export interface TradeContext {
 	last: number;
 }
 export interface TradingDialogOptions {
-	/** Custom fields to be displayed in the dialog (adds additional input fields to the Order dialog).
+	/** Custom fields that are displayed in the Order Ticket.
+	 * Refer to the [Add custom fields](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/order-ticket.md#add-custom-fields) section for more information.
 	 *
 	 * **Example**
 	 * ```javascript
@@ -2218,7 +2377,7 @@ export type FormatterName = Nominal<string, "FormatterName">;
  */
 export type InputFieldValidator = (value: any) => InputFieldValidatorResult;
 export type InputFieldValidatorResult = PositiveBaseInputFieldValidatorResult | NegativeBaseInputFieldValidatorResult;
-export type LanguageCode = "ar" | "zh" | "cs" | "ca_ES" | "nl_NL" | "en" | "fr" | "de" | "el" | "he_IL" | "hu_HU" | "id_ID" | "it" | "ja" | "ko" | "pl" | "pt" | "ro" | "ru" | "es" | "sv" | "th" | "tr" | "vi" | "ms_MY" | "zh_TW";
+export type LanguageCode = "ar" | "zh" | "ca_ES" | "en" | "fr" | "de" | "he_IL" | "id_ID" | "it" | "ja" | "ko" | "pl" | "pt" | "ru" | "es" | "sv" | "th" | "tr" | "vi" | "ms_MY" | "zh_TW";
 export type LeverageParams = LeverageInfoParams | LeverageSetParams;
 export type Order = PlacedOrder | BracketOrder;
 export type OrderTableColumn = AccountManagerColumn & {
@@ -2236,7 +2395,8 @@ export type OrderTableColumn = AccountManagerColumn & {
 	 */
 	supportedStatusFilters?: OrderStatusFilter[];
 };
-export type SymbolType = "stock" | "index" | "forex" | "futures" | "bitcoin" | "crypto" | "undefined" | "expression" | "spread" | "cfd" | "economic" | "equity" | "dr" | "bond" | "right" | "warrant" | "fund" | "structured" | "commodity" | "fundamental" | "spot";
+export type SuggestedQtyChangedListener = (newQty: number) => void;
+export type SymbolType = "stock" | "index" | "forex" | "futures" | "bitcoin" | "crypto" | "undefined" | "expression" | "spread" | "cfd" | "economic" | "equity" | "dr" | "bond" | "right" | "warrant" | "fund" | "structured" | "commodity" | "fundamental" | "spot" | "swap";
 /**
  * A function that takes an {@link TableFormatterInputs} object and returns a `string`.
  */
