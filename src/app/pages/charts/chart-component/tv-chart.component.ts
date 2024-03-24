@@ -155,9 +155,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       library_path: "assets/charting_library/",
       locale: getLanguageFromURL() || "en",
       disabled_features: [
-        "open_account_manager",
-        "trading_account_manager",
-        "save_chart_properties_to_local_storage",
+        // "open_account_manager",
+        // "trading_account_manager",
+        // "save_chart_properties_to_local_storage",
       ],
       enabled_features: [
         "study_templates",
@@ -168,7 +168,11 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         "pre_post_market_sessions",
         "show_symbol_logos",
         "watchlist_sections",
-        "studies_extend_time_scale"
+        "studies_extend_time_scale",
+        "save_chart_properties_to_local_storage",
+        "trading_account_manager",
+        "open_account_manager"
+
       ],
       charts_storage_url: this._chartsStorageUrl,
       charts_storage_api_version: this._chartsStorageApiVersion,
@@ -621,7 +625,8 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                 };
             },
         },
-
+// eND kELTS
+// bEGIN CYCLE POINT
         {
           name: 'FlowTrade Cycle Point',
           metainfo: {
@@ -846,102 +851,103 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
                   return [rPointRes1,rPointRes2,rPointRes3,rPointRes4,rPointRes5,rPointRes6];
               };
-          },
-      },
-
-      {
-        name: 'FlowTrade Flow Index',
-        metainfo: {
-            _metainfoVersion: 55,
-            id: 'FTFlowIndex@tv-basicstudies-1' as RawStudyMetaInfoId,
-            description: 'FlowTrade Flow Index Indicator',
-            shortDescription: 'FTFI',
-            is_price_study: true,
-            isCustomIndicator: true,
-            plots: [
-                {
-                    id: 'plot_0',
-                    type: StudyPlotType.Line,
-                },
-
-            ],
-
-
-            defaults: {
-
-              styles: {},
-              precision: 4,
-              inputs: {},
-            },
-            styles: {
-                plot_0: {
-                    title: 'Flow Index',
-                    histogramBase: 0,
-                },
-
-            },
-            inputs: [],
-            format: {
-                type: 'price',
-                precision: 2,
             },
         },
-        constructor: function (
-            this: LibraryPineStudy<IPineStudyResult>
-        ) {
-              this.init = function (context, inputCallback) {
-                this._context = context;
-                this._input = inputCallback;
+// end CYCLE POINT
+// BEGING FLOW INDEX
+          {
+            name: 'FlowTrade Flow Index',
+            metainfo: {
+                _metainfoVersion: 55,
+                id: 'FTFlowIndex@tv-basicstudies-1' as RawStudyMetaInfoId,
+                description: 'FlowTrade Flow Index Indicator',
+                shortDescription: 'FTFI',
+                is_price_study: true,
+                isCustomIndicator: true,
+                plots: [
+                    {
+                        id: 'plot_0',
+                        type: StudyPlotType.Line,
+                    },
 
-            };
-              this.main = function (context, inputCallback) {
-                this._context = context;
-                this._input = inputCallback;
-
-                var c =PineJS.Std.close(this._context)
-                var h = PineJS.Std.high(this._context)
-                var l = PineJS.Std.low(this._context)
-                var o = PineJS.Std.open(this._context)
-                var vol = PineJS.Std.volume(this._context)
-
-                var tw = h - Math.max(o, c)
-                var bw = Math.min(o, c) - l
-                var body = Math.abs(c - o)
-
-                // this.f_rate = function () {
-
-                //   var v = vol > 1000000 ? vol / 50000 : vol > 10000 ? vol / 50 : vol
-                //   var ret = 0.5 * (tw + bw + 2 * body) / (tw + bw + body) * v
-                //   ret = ret == 0 ? 0.5 : ret
-                //   ret = o > c ? -ret : ret
-                //   var deltaSum = PineJS.Std.cum(ret, this._context)
-                //   console.log("deltasum is a " + deltaSum)
-
-                //   return {deltaSum}
-
-                // }
-
-                var v = vol > 1000000 ? vol / 50000 : vol > 10000 ? vol / 50 : vol
-                var ret = 0.5 * (tw + bw + 2 * body) / (tw + bw + body) * v
-                ret = ret == 0 ? 0.5 : ret
-                ret = o > c ? -ret : ret
-                var flowIndex = PineJS.Std.cum(ret, this._context)
-                console.log("flowindex is a " + flowIndex)
-
-                // return {flowIndex}
+                ],
 
 
-                //Now you can call the get function and set function separately
-                // var flowIndex = this.f_rate()
-                // console.log("flowindex is a " + flowIndex)
-                // console.log("f_rate is a " + this.f_rate)
-                // return [flowIndex];
-                return [flowIndex];
-            };
+                defaults: {
 
+                  styles: {},
+                  precision: 2,
+                  inputs: {},
+                },
+                styles: {
+                    plot_0: {
+                        title: 'Flow Index',
+                        histogramBase: 0,
+                    },
+
+                },
+                inputs: [],
+                format: {
+                    type: 'price',
+                    precision: 2,
+                },
+            },
+            constructor: function (
+                this: LibraryPineStudy<IPineStudyResult>
+            ) {
+                  this.init = function (context, inputCallback) {
+                    this._context = context;
+                    this._input = inputCallback;
+
+                };
+                  this.main = function (context, inputCallback) {
+                    this._context = context;
+                    this._input = inputCallback;
+
+                    var c =PineJS.Std.close(this._context)
+                    var h = PineJS.Std.high(this._context)
+                    var l = PineJS.Std.low(this._context)
+                    var o = PineJS.Std.open(this._context)
+                    var vol = PineJS.Std.volume(this._context)
+
+                    var tw = h - Math.max(o, c)
+                    var bw = Math.min(o, c) - l
+                    var body = Math.abs(c - o)
+
+                    // this.f_rate = function () {
+
+                    //   var v = vol > 1000000 ? vol / 50000 : vol > 10000 ? vol / 50 : vol
+                    //   var ret = 0.5 * (tw + bw + 2 * body) / (tw + bw + body) * v
+                    //   ret = ret == 0 ? 0.5 : ret
+                    //   ret = o > c ? -ret : ret
+                    //   var deltaSum = PineJS.Std.cum(ret, this._context)
+                    //   console.log("deltasum is a " + deltaSum)
+
+                    //   return {deltaSum}
+
+                    // }
+
+                    var v = vol > 1000000 ? vol / 50000 : vol > 10000 ? vol / 50 : vol
+                    var ret = 0.5 * (tw + bw + 2 * body) / (tw + bw + body) * v
+                    ret = ret == 0 ? 0.5 : ret
+                    ret = o > c ? -ret : ret
+                    var flowIndex = PineJS.Std.cum(ret, this._context)
+                    console.log("flowindex is a " + flowIndex)
+
+                    // return {flowIndex}
+
+
+                    //Now you can call the get function and set function separately
+                    // var flowIndex = this.f_rate()
+                    // console.log("flowindex is a " + flowIndex)
+                    // console.log("f_rate is a " + this.f_rate)
+                    // return [flowIndex];
+                    return [flowIndex];
+                };
+
+            },
         },
-    },
-
+// eND fLOW INDEX
         ]);
       },
     };
@@ -968,47 +974,47 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         console.log(data, "drawing");
       });
     });
-    tvWidget.headerReady().then(() => {
-      tvWidget
-        .createDropdown({
-          title: "",
-          tooltip: "Open Main Menu",
-          items: [
-            {
-              title: "item#1",
-              onSelect: () => {
-                console.log("1");
-              },
-            },
-            {
-              title: "item#2",
-              onSelect: () => {
-                //tvWidget.setSymbol("IBM", "1D");
-              },
-            },
-            {
-              title: "item#3",
-              onSelect: () => {
-                tvWidget.activeChart().createStudy("MACD", false, false, {
-                  in_0: 14,
-                  in_1: 30,
-                  in_3: "close",
-                  in_2: 9,
-                });
-              },
-            },
-          ],
-          // icon: `<img src="../../../assets/images/logo.png" />`,
-        })
-        .then((myDropdownApi) => {
-          // Use myDropdownApi if you need to update the dropdown:
-          // myDropdownApi.applyOptions({
-          //     title: 'a new title!'
-          // });
-          // Or remove the dropdown:
-          // myDropdownApi.remove();
-        });
-    });
+    // tvWidget.headerReady().then(() => {
+    //   tvWidget
+    //     .createDropdown({
+    //       title: "",
+    //       tooltip: "Open Main Menu",
+    //       items: [
+    //         {
+    //           title: "item#1",
+    //           onSelect: () => {
+    //             console.log("1");
+    //           },
+    //         },
+    //         {
+    //           title: "item#2",
+    //           onSelect: () => {
+    //             //tvWidget.setSymbol("IBM", "1D");
+    //           },
+    //         },
+    //         {
+    //           title: "item#3",
+    //           onSelect: () => {
+    //             tvWidget.activeChart().createStudy("MACD", false, false, {
+    //               in_0: 14,
+    //               in_1: 30,
+    //               in_3: "close",
+    //               in_2: 9,
+    //             });
+    //           },
+    //         },
+    //       ],
+    //       // icon: `<img src="../../../assets/images/logo.png" />`,
+    //     })
+    //     .then((myDropdownApi) => {
+    //       // Use myDropdownApi if you need to update the dropdown:
+    //       // myDropdownApi.applyOptions({
+    //       //     title: 'a new title!'
+    //       // });
+    //       // Or remove the dropdown:
+    //       // myDropdownApi.remove();
+    //     });
+    // });
   }
 
   ngOnDestroy() {
