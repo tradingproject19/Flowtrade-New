@@ -16241,7 +16241,7 @@ export interface PineJSStd {
 	 * @param source - Series of values to process.
 	 * @param length - Number of bars (length).
 	 * @returns The rate of change of `source` for `length` bars back.
-	 */
+	 */pin
 	roc(source: IPineSeries, length: number): number;
 	/**
 	 * Measure of difference between the series and its sma.

@@ -16,6 +16,8 @@ import {
   ChartingLibraryWidgetOptions,
   CustomIndicator,
   IChartingLibraryWidget,
+  IContext,
+  IPineSeries,
   IPineStudyResult,
   LanguageCode,
   LibraryPineStudy,
@@ -37,6 +39,7 @@ import * as moment from "moment";
 import { SaveLoadAdapterService } from "src/app/core/services/save-load-adapter.service";
 import { WatchlistService } from "src/app/core/services/watchlist.service";
 import { DatabaseService } from "src/app/core/services/database.service";
+import { computeVisibleDayRange } from "@fullcalendar/core/internal";
 @Component({
   selector: "app-chart-component",
   templateUrl: "./tv-chart.component.html",
@@ -181,7 +184,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         "paneProperties.background": "#222736",
         "scalesProperties.textColor": "#a6b0cf",
       },
-      debug: false,
+      debug: true,
       news_provider: async (symbol, callback) => {
         let newItem = await this.dataService.getTickerNews(symbol);
         let result: NewsItem[] = [];
@@ -299,28 +302,36 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         },
 
         getChartTemplateContent: async (templateName: string) => {
-          return new Promise<any>((data: any) => { });
+          return new Promise<any>((data: any) => {});
         },
         getAllChartTemplates(): Promise<string[]> {
-          return new Promise<any>((data: any) => { });
+          return new Promise<any>((data: any) => {});
         },
         saveChartTemplate(
           newName: string,
           theme: ChartTemplateContent
         ): Promise<void> {
-          return new Promise<any>((data: any) => { });
+          return new Promise<any>((data: any) => {});
         },
         removeChartTemplate(templateName: string): Promise<void> {
-          return new Promise<any>((data: any) => { });
+          return new Promise<any>((data: any) => {});
         },
-        saveLineToolsAndGroups: function (layoutId: string, chartId: string | number, state: LineToolsAndGroupsState): Promise<void> {
+        saveLineToolsAndGroups: function (
+          layoutId: string,
+          chartId: string | number,
+          state: LineToolsAndGroupsState
+        ): Promise<void> {
           throw new Error("Function not implemented.");
         },
-        loadLineToolsAndGroups: function (layoutId: string, chartId: string | number, requestType: LineToolsAndGroupsLoadRequestType, requestContext: LineToolsAndGroupsLoadRequestContext): Promise<Partial<LineToolsAndGroupsState>> {
+        loadLineToolsAndGroups: function (
+          layoutId: string,
+          chartId: string | number,
+          requestType: LineToolsAndGroupsLoadRequestType,
+          requestContext: LineToolsAndGroupsLoadRequestContext
+        ): Promise<Partial<LineToolsAndGroupsState>> {
           throw new Error("Function not implemented.");
-        }
+        },
       },
-      //debug: true,
       custom_indicators_getter: (PineJS) => {
         return Promise.resolve<CustomIndicator[]>([
           /* Requesting data for another ticker */
@@ -382,6 +393,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                 this._context.new_sym(symbol, PineJS.Std.period(this._context));
               };
 
+            
+
+              
               this.main = function (context, inputCallback) {
                 this._context = context;
                 this._input = inputCallback;
@@ -414,16 +428,294 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
               };
             },
           },
+          {
+            name: "Flow Index Test",
+            metainfo: {
+              _metainfoVersion: 52,
+              is_hidden_study: false,
+              is_price_study: true,
+              isCustomIndicator: true,
+              defaults: {
+                styles: {
+                  plot_0: {
+                    linestyle: 0,
+                    linewidth: 1,
+                    plottype: 0,
+                    trackPrice: false,
+                    transparency: 0,
+                    visible: true,
+                    color: "#2196F3",
+                  },
+                },
+                inputs: {},
+                
+              },
+              plots: [
+                {
+                  id: "plot_0",
+                  type: StudyPlotType.Line,
+                },
+              ],
+              styles: {
+                plot_0: {
+                  title: "Plot",
+                  histogramBase: 0,
+                  joinPoints: false,
+                },
+              },
+              description: "Flow Index",
+              shortDescription: "Flow Index",
+              inputs: [
+                // {
+                //   id: "first_visible_bar_time",
+                //   name: "First Visible Bar Time",
+                //   defval: 0,
+                //   isHidden: !0,
+                //   max: 253370764800,
+                //   min: -253370764800,
+                //   type: "time",
+                // },
+                // {
+                //   id: "last_visible_bar_time",
+                //   name: "Last Visible Bar Time",
+                //   defval: 0,
+                //   isHidden: !0,
+                //   max: 253370764800,
+                //   min: -253370764800,
+                //   type: "time",
+                // },
+              ],
+              id: "Flow Index@tv-basicstudies-1" as RawStudyMetaInfoId,
+              name: "Net Volume Test",
+              format: {
+                type: "volume",
+              },
+            },
+            constructor: function (this: LibraryPineStudy<IPineStudyResult>) {
+              const upAndDownVolume = (
+                close: number,
+                lastClose: number,
+                open: number,
+                volume: number
+              ): number => {
+                let posVol = 0.0;
+                let negVol = 0.0;
+                let isBuyVolume = true;
+
+                switch (true) {
+                  case close > open:
+                    isBuyVolume = true;
+                    break;
+                  case close < open:
+                    isBuyVolume = false;
+                    break;
+                  case close > lastClose:
+                    isBuyVolume = true;
+                    break;
+                  case close < lastClose:
+                    isBuyVolume = false;
+                    break;
+                }
+
+                if (isBuyVolume) posVol += volume;
+                else negVol -= volume;
+
+                return posVol + negVol;
+              };
+
+              const getHighLow = (
+                arr: IPineSeries
+              ): [number, number, number] => {
+                let cumVolume = 0.0;
+                let maxVolume = 0.0;
+                let minVolume = 0.0;
+
+                cumVolume += arr.get();
+                maxVolume = Math.max(maxVolume, cumVolume);
+                minVolume = Math.min(minVolume, cumVolume);
+
+                return [maxVolume, minVolume, cumVolume];
+              };
+
+              var tickVol = [];
+
+              // Function to compute delta volume, max delta volume, min delta volume, and total delta volume
+              function Vol() {
+                var deltaVol = 0.0;
+                var totalDeltaVol = 0.0;
+                var maxDeltaVol = 0.0;
+                var minDeltaVol = 0.0;
+                var temp = close.length;
+                for (var i = 0; i < temp; i++) {
+                  deltaVol += tickVol[i] || 0;
+                  totalDeltaVol += Math.abs(tickVol[i] || 0);
+                  if (deltaVol > maxDeltaVol) {
+                    maxDeltaVol = deltaVol;
+                  }
+                  if (deltaVol < minDeltaVol) {
+                    minDeltaVol = deltaVol;
+                  }
+                }
+                return [deltaVol, maxDeltaVol, minDeltaVol, totalDeltaVol];
+              }
+
+              function isDateGreaterThanApril15(dateString) {
+                // Split the date string into day and month parts
+                var parts = dateString.split("/");
+
+                // JavaScript Date uses 0-indexed months, so subtract 1 from the month
+                var month = parseInt(parts[1]) - 1;
+                var day = parseInt(parts[0]);
+
+                // Create a Date object for April 15th
+                var april15th = new Date(new Date().getFullYear(), 3, 14); // Month is 3 (April is 3rd month)
+
+                // Create a Date object for the given date
+                var inputDate = new Date(new Date().getFullYear(), month, day);
+
+                // Compare the input date with April 15th
+                return inputDate > april15th;
+              }
+
+              function GetY(deltaY, distanceScreenY, offsetPercent, value) {
+                var num = (distanceScreenY / 100.0) * offsetPercent;
+                return (
+                  distanceScreenY -
+                  1.0 * num -
+                  ((distanceScreenY - 2.0 * num) / deltaY) * value
+                );
+              }
+
+              this.main = function (context, inputCallback) {
+                this._context = context;
+                this._input = inputCallback;
+                // Select the main symbol
+                // this._context.select_sym(0);
+                // const mainSymbolTime = this._context.new_var(
+                //   this._context.symbol.time
+                // );
+                var unixTimestamp = this._context.symbol.time;
+                const date = new Date(unixTimestamp);
+                const localDate = date.toLocaleDateString();
+
+                var isGreaterThanApril15 = isDateGreaterThanApril15(localDate);
+
+                if (!isGreaterThanApril15) {
+                  return;
+                }
+
+                const i = PineJS.Std.close(this._context);
+                const previousClose = this._context.new_unlimited_var(i);
+                var res = upAndDownVolume(
+                  PineJS.Std.close(this._context),
+                  previousClose,
+                  PineJS.Std.open(this._context),
+                  PineJS.Std.volume(this._context)
+                );
+                const diffVolArray: IPineSeries =
+                  this._context.new_unlimited_var(res);
+
+                const openVal = PineJS.Std.open(this._context);
+
+                // Get local date and time components
+
+                // console.log("last is " + s)
+                //       var prevLast = this._input(0);
+                //       var laast = this._input(1);
+
+                const [maxVolume, minVolume, lastVolume]: [
+                  number,
+                  number,
+                  number
+                ] = getHighLow(diffVolArray);
+                const cumLastVolume = this._context.new_var(lastVolume + res);
+
+                var vol = PineJS.Std.volume(this._context);
+                var volRes = i > previousClose ? vol : -vol;
+                var volumeDelta = PineJS.Std.cum(volRes, this._context);
+               
+
+                // Calculate cumulative volume delta
+                var cumulativeVolumeDelta = PineJS.Std.cum(
+                  volumeDelta,
+                  this._context
+                );
+
+                //   const s = this._context.new_var(i);
+                //   var res = upAndDownVolume(
+                //     PineJS.Std.close(this._context),
+                //     s,
+                //     PineJS.Std.open(this._context),
+                //     PineJS.Std.volume(this._context)
+                //   );
+                //   const lastVol = PineJS.Std.cum(lastVolume + openVal, this._context);
+                //   for (var v = 0; i < close.length; v++) {
+                //     tickVol.push(close[v] > open[v] ? volume[v] : close[i] < open[i] ? -volume[i] : 0.0);
+                // }
+                const tickVol =
+                  PineJS.Std.close(this._context) > previousClose.get(1)
+                    ? vol
+                    : PineJS.Std.close(this._context) < previousClose.get(1)
+                    ? -vol
+                    : 0.0;
+                // const volDelta: IPineSeries = this._context.new_unlimited_var(tickVol);
+
+                var totalTickVolDelta = this._context.new_unlimited_var(
+                  tickVol + previousClose
+                );
+                var totalcumulativeVolumeDelta = PineJS.Std.cum(
+                  tickVol,
+                  this._context
+                );
+                const localTime = date.toLocaleTimeString();
+                console.log(
+                  "at " +
+                    localDate +
+                    " " +
+                    localTime +
+                    " prev last is " +
+                    previousClose.get(1) +
+                    " last is " +
+                    i
+                );
+
+                // new_var().get
+
+                //   PineJS.Std.close(this._context)
+
+                // this._context.ggt(e, 0) ? t : r.lt(i, 0) ? -t : 0 * t
+                return [totalcumulativeVolumeDelta];
+              };
+            },
+          },
         ]);
       },
     };
-
+    var leftVisibleTime;
     const tvWidget = new widget(widgetOptions);
     this._tvWidget = tvWidget;
     tvWidget.onChartReady(async () => {
       let watchlist = await this._tvWidget.watchList();
       await this.watchListService.subscribeToWatchlistEvents(watchlist);
     });
+    tvWidget.onChartReady(function() {
+      tvWidget.chart().onVisibleRangeChanged().subscribe(null, function(range) {
+          leftVisibleTime = range.from;
+          calculateIndicator();
+          
+          // Use leftVisibleTime for your logic
+      });
+
+      function calculateIndicator() {
+        // Use leftVisibleBarTime for your indicator logic
+        if (leftVisibleTime !== null) {
+          console.log(leftVisibleTime);
+            // Your indicator logic here
+            // Example: console.log(leftVisibleBarTime);
+        }
+    }
+  });
+
     tvWidget.subscribe("onAutoSaveNeeded", () => {
       tvWidget.saveChartToServer(
         () => {
