@@ -156,6 +156,7 @@ export class ChartDataFeed implements IDatafeedChartApi, IExternalDatafeed {
         format: "price",
         pricescale: 0.1,
         has_intraday: true,
+        has_ticks: true,
         visible_plots_set: "ohlcv",
         has_weekly_and_monthly: true,
         minmov: 0.01,
@@ -257,6 +258,7 @@ export class ChartDataFeed implements IDatafeedChartApi, IExternalDatafeed {
         low: bar.l,
         close: bar.c,
         volume: bar.v,
+        test: 1,
       }));
 
       if (periodParams.firstDataRequest) {
@@ -471,7 +473,7 @@ export class ChartDataFeed implements IDatafeedChartApi, IExternalDatafeed {
     symbolInfo: LibrarySymbolInfo
   ): ResolutionString {
     console.log("to be implemented");
-    return "bilal" as ResolutionString;
+    return "1S" as ResolutionString;
   }
   onReady(callback: OnReadyCallback): void {
     setTimeout(() => {

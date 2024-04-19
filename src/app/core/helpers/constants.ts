@@ -1,4 +1,6 @@
 export const SupportedResolutions = [
+  "1T",
+  "1S",
   "1",
   "2",
   "3",
@@ -20,6 +22,8 @@ export const SupportedResolutions = [
 ];
 
 export const resolutionMapping: Record<string, [string, string]> = {
+  "1T": ["1000", "tick"],
+  "1S": ["1", "second"],
   "1": ["1", "minute"],
   "2": ["2", "minute"],
   "3": ["3", "minute"],

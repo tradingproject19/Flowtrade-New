@@ -5,6 +5,7 @@ import {
   OnDestroy,
   AfterViewInit,
 } from "@angular/core";
+import fetch from "node-fetch";
 import { ChartDataFeed } from "./datafeed/datafeed";
 import { FirebaseAuthBackend } from "src/app/authUtils";
 import { User } from "src/app/core/models/auth.models";
@@ -164,6 +165,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         "save_chart_properties_to_local_storage",
       ],
       enabled_features: [
+        "seconds_resolution",
         "study_templates",
         "add_to_watchlist",
         "chart_crosshair_menu",
@@ -393,9 +395,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                 this._context.new_sym(symbol, PineJS.Std.period(this._context));
               };
 
-            
-
-              
               this.main = function (context, inputCallback) {
                 this._context = context;
                 this._input = inputCallback;
@@ -434,6 +433,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
               _metainfoVersion: 52,
               is_hidden_study: false,
               is_price_study: true,
+
               isCustomIndicator: true,
               defaults: {
                 styles: {
@@ -448,7 +448,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                   },
                 },
                 inputs: {},
-                
               },
               plots: [
                 {
@@ -488,10 +487,16 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
               id: "Flow Index@tv-basicstudies-1" as RawStudyMetaInfoId,
               name: "Net Volume Test",
               format: {
-                type: "volume",
+                type: "price",
+                // Precision is set to one digit, e.g. 777.7
+                precision: 1,
               },
             },
             constructor: function (this: LibraryPineStudy<IPineStudyResult>) {
+              var distanceScreenY;
+              this.init = function (context, inputCallback) {
+                distanceScreenY = tvWidget.chart(0).getAllPanesHeight()[0] / 2;
+              };
               const upAndDownVolume = (
                 close: number,
                 lastClose: number,
@@ -568,7 +573,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                 var day = parseInt(parts[0]);
 
                 // Create a Date object for April 15th
-                var april15th = new Date(new Date().getFullYear(), 3, 14); // Month is 3 (April is 3rd month)
+                var april15th = new Date(new Date().getFullYear(), 3, 16); // Month is 3 (April is 3rd month)
 
                 // Create a Date object for the given date
                 var inputDate = new Date(new Date().getFullYear(), month, day);
@@ -585,9 +590,96 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                   ((distanceScreenY - 2.0 * num) / deltaY) * value
                 );
               }
+              function getMinNonZeroValue(integerList) {
+                if (integerList.length === 0) {
+                  return null; // Return null if the list is empty
+                }
+
+                let min = integerList[0]; // Assume the first element as minimum
+
+                // Iterate through the list
+                for (let i = 1; i < integerList.length; i++) {
+                  if (integerList[i] < min) {
+                    min = integerList[i]; // Update min if current element is smaller
+                  }
+                }
+
+                return min; // Return the minimum value
+              }
+
+              function getMaxNonZeroValue(integerList) {
+                if (integerList.length === 0) {
+                  return null; // Return null if the list is empty
+                }
+
+                let max = integerList[0]; // Assume the first element as minimum
+
+                // Iterate through the list
+                for (let i = 1; i < integerList.length; i++) {
+                  if (integerList[i] > max) {
+                    max = integerList[i]; // Update min if current element is smaller
+                  }
+                }
+
+                return max; // Return the minimum value
+              }
+
+              var arrayOfCumDelta = [];
+
+              function addOneMinuteToUnixTime(unixTime) {
+                // Convert Unix time to milliseconds
+                // const milliseconds = unixTime * 1000;
+                // Add 1 minute (60 seconds) in milliseconds
+                const newMilliseconds = unixTime - (60 * 1000);
+                
+                // Convert back to Unix time (in seconds)
+                return Math.floor(newMilliseconds);
+            }
+
+              async function getTradesBetweenTimes(symbol, startTime, endTime) {
+                const apiKey = 'Ew7C5GgWbF2HJ7dNkpVeSTuUATVUrdX7';
+                const apiUrl = 
+                `https://api.polygon.io/v3/trades/AAPL?timestamp.gt=${startTime.toString()}000000&timestamp.lt=${endTime.toString()}000000&order=asc&limit=500&apiKey=${apiKey}`;
+             
+                try {
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+                    console.log("Data returned is " + data.results);
+                    return data.results;
+                } catch (error) {
+                    console.error('Error fetching trade data:', error);
+                    return null;
+                }
+            }
+
+              function calculateVolumeDelta(trades) {
+                let buyVolume = 0;
+                let sellVolume = 0;
+                for (let i = 1; i < trades.length; i++) {
+                  const currentElement = trades[i];
+                  const previousElement = trades[i - 1];
+                  
+                  // Compare current element with previous element
+                  if (currentElement.price > previousElement.price) {
+                    buyVolume += currentElement.size;
+                  } else if (currentElement.price < previousElement.price) {
+                    sellVolume += currentElement.size;
+                  }  
+              }
+                // trades.forEach((trade) => {
+                //   if (trade.v > 0) {
+                //     if (trade.c > trade.o) {
+                //     } else {
+                //       sellVolume += trade.v;
+                //     }
+                //   }
+                // });
+
+                return buyVolume - sellVolume;
+              }
 
               this.main = function (context, inputCallback) {
-                this._context = context;
+                this._context = context ;
                 this._input = inputCallback;
                 // Select the main symbol
                 // this._context.select_sym(0);
@@ -595,14 +687,30 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                 //   this._context.symbol.time
                 // );
                 var unixTimestamp = this._context.symbol.time;
+
+                //yeah we can pass bar start and endtime to trades api and fetch all the trades for that bar
+                //api.polygon.io/v3/trades/AAPL?timestamp=2024-04-18&limit=500&sort=timestamp&apiKey=Ew7C5GgWbF2HJ7dNkpVeSTuUATVUrdX7
                 const date = new Date(unixTimestamp);
-                const localDate = date.toLocaleDateString();
+                const localDate =  date.toLocaleDateString();
 
                 var isGreaterThanApril15 = isDateGreaterThanApril15(localDate);
 
                 if (!isGreaterThanApril15) {
                   return;
                 }
+
+                const symbol = 'AAPL';
+const startTime = addOneMinuteToUnixTime(this._context.symbol.time );
+const endTime = this._context.symbol.time ;
+
+getTradesBetweenTimes(symbol, startTime, endTime)
+    .then(trades => {
+        const volumeDelta = calculateVolumeDelta(trades);
+        console.log('Volume delta:', volumeDelta);
+    })
+    .catch(error => {
+        console.error('Error getting trades:', error);
+    });
 
                 const i = PineJS.Std.close(this._context);
                 const previousClose = this._context.new_unlimited_var(i);
@@ -633,8 +741,6 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                 var vol = PineJS.Std.volume(this._context);
                 var volRes = i > previousClose ? vol : -vol;
                 var volumeDelta = PineJS.Std.cum(volRes, this._context);
-               
-
                 // Calculate cumulative volume delta
                 var cumulativeVolumeDelta = PineJS.Std.cum(
                   volumeDelta,
@@ -652,39 +758,53 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
                 //   for (var v = 0; i < close.length; v++) {
                 //     tickVol.push(close[v] > open[v] ? volume[v] : close[i] < open[i] ? -volume[i] : 0.0);
                 // }
-                const tickVol =
-                  PineJS.Std.close(this._context) > previousClose.get(1)
-                    ? vol
-                    : PineJS.Std.close(this._context) < previousClose.get(1)
-                    ? -vol
-                    : 0.0;
+                var tickVol;
+                if (PineJS.Std.close(this._context) > previousClose.get(1)) {
+                  tickVol = vol;
+                } else if (
+                  PineJS.Std.close(this._context) < previousClose.get(1)
+                ) {
+                  tickVol = vol * -1;
+                } else {
+                  tickVol = 0.0;
+                }
                 // const volDelta: IPineSeries = this._context.new_unlimited_var(tickVol);
 
-                var totalTickVolDelta = this._context.new_unlimited_var(
-                  tickVol + previousClose
-                );
                 var totalcumulativeVolumeDelta = PineJS.Std.cum(
                   tickVol,
                   this._context
                 );
+                // var historyCumVDelta =
+                // this._context.n(totalcumulativeVolumeDelta).get(1);
+                arrayOfCumDelta.push(totalcumulativeVolumeDelta);
                 const localTime = date.toLocaleTimeString();
-                console.log(
-                  "at " +
-                    localDate +
-                    " " +
-                    localTime +
-                    " prev last is " +
-                    previousClose.get(1) +
-                    " last is " +
-                    i
-                );
 
+                var min = getMinNonZeroValue(arrayOfCumDelta);
+                var max = getMaxNonZeroValue(arrayOfCumDelta);
+                var deltaY = max - min;
+
+                var barValue = totalcumulativeVolumeDelta - min;
+
+                var calculatedY = GetY(deltaY, distanceScreenY, 10, barValue);
+                // console.log(
+                //   "at " +
+                //     localDate +
+                //     localTime +
+                //     " tick val " +
+                //     tickVol +
+                //     " distance " +
+                //     distanceScreenY +
+                //     " barvalue " +
+                //     barValue +
+                //     " y " +
+                //     calculatedY
+                // );
                 // new_var().get
 
                 //   PineJS.Std.close(this._context)
 
                 // this._context.ggt(e, 0) ? t : r.lt(i, 0) ? -t : 0 * t
-                return [totalcumulativeVolumeDelta];
+                return [calculatedY];
               };
             },
           },
@@ -698,23 +818,26 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       let watchlist = await this._tvWidget.watchList();
       await this.watchListService.subscribeToWatchlistEvents(watchlist);
     });
-    tvWidget.onChartReady(function() {
-      tvWidget.chart().onVisibleRangeChanged().subscribe(null, function(range) {
+    tvWidget.onChartReady(function () {
+      tvWidget
+        .chart()
+        .onVisibleRangeChanged()
+        .subscribe(null, function (range) {
           leftVisibleTime = range.from;
           calculateIndicator();
-          
+          // var res = tvWidget.chart().getStudyById(null);
           // Use leftVisibleTime for your logic
-      });
+        });
 
       function calculateIndicator() {
         // Use leftVisibleBarTime for your indicator logic
-        if (leftVisibleTime !== null) {
-          console.log(leftVisibleTime);
-            // Your indicator logic here
-            // Example: console.log(leftVisibleBarTime);
-        }
-    }
-  });
+        // if (leftVisibleTime !== null) {
+        //   console.log(leftVisibleTime);
+        //     // Your indicator logic here
+        //     // Example: console.log(leftVisibleBarTime);
+        // }
+      }
+    });
 
     tvWidget.subscribe("onAutoSaveNeeded", () => {
       tvWidget.saveChartToServer(
