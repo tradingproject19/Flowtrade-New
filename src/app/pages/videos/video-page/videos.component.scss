@@ -1,7 +1,7 @@
-.page-content {
-  height: max-content;
-  min-height: 100vh;
-}
-.footer {
-  position: fixed;
+.full-bg {
+  background-image: url("../../../../assets/images/coming-soon/tradier.png"); /* Adjust the path to your image file */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: calc(100vh - 70px); /* Subtracting the height of the top bar */
 }

@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "esModuleInterop": true,
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
@@ -12,13 +13,10 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "target": "ES2022",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
+    "enableI18nLegacyMessageIdFormat": false
   }
 }

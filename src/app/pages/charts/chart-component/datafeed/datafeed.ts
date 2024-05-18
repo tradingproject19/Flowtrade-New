@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core";
 import { Observable, Subscription, debounceTime, filter, scan } from "rxjs";
 import * as uuid from "uuid";
-import * as moment from "moment";
+import moment from "moment";
 import {
   SupportedResolutions,
   resolutionMapping,

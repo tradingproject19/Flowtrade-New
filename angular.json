@@ -15,7 +15,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "allowedCommonJsDependencies": [
               "rxjs",
@@ -44,6 +44,11 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                ""
+              ]
+            },
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -60,7 +65,8 @@
               "src/assets/scss/app.scss",
               "src/assets/scss/icons.scss",
               "./node_modules/ngx-toastr/toastr.css",
-              "./node_modules/ngx-toastr/toastr-old.css"
+              "./node_modules/ngx-toastr/toastr-old.css",
+              "node_modules/flatpickr/dist/flatpickr.css"
             ],
             "scripts": []
           },
@@ -100,14 +106,14 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "FlowTrade:build"
+            "buildTarget": "FlowTrade:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "FlowTrade:build:production"
+              "buildTarget": "FlowTrade:build:production"
             },
             "development": {
-              "browserTarget": "FlowTrade:build:development"
+              "buildTarget": "FlowTrade:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -115,7 +121,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "FlowTrade:build"
+            "buildTarget": "FlowTrade:build"
           }
         },
         "test": {

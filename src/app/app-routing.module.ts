@@ -4,6 +4,7 @@ import { Routes, RouterModule, PreloadAllModules } from "@angular/router";
 import { AuthGuard } from "./core/guards/auth.guard";
 import { LayoutComponent } from "./layouts/layout.component";
 import { ClassicComponent } from "./pages/classic/classic.component";
+import { DarkPoolComponent } from "./pages/dark-pool/dark-pool.component";
 const routes: Routes = [
   {
     path: "account",
@@ -47,13 +48,18 @@ const routes: Routes = [
   },
   {
     path: "classic",
-    component:ClassicComponent,
+    component: ClassicComponent,
     canActivate: [AuthGuard],
   },
   {
-    path: '**', // route every undefined route to the root of this feature
-    redirectTo: ''
-  }
+    path: "dark-pool",
+    component: LayoutComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: "**", // route every undefined route to the root of this feature
+    redirectTo: "",
+  },
 ];
 
 @NgModule({

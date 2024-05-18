@@ -11,7 +11,7 @@ import {
 import { ChartDataFeed } from "./datafeed/datafeed";
 import { FirebaseAuthBackend } from "src/app/authUtils";
 import { User } from "src/app/core/models/auth.models";
-import * as uuid from "uuid";
+import uuid from "uuid";
 import {
   ChartData,
   ChartMetaInfo,
@@ -36,7 +36,7 @@ import {
   widget,
 } from "../../../../assets/charting_library";
 import { ChartsDataService } from "src/app/core/services/charts-data.service";
-import * as moment from "moment";
+import moment from "moment";
 import { SaveLoadAdapterService } from "src/app/core/services/save-load-adapter.service";
 import { WatchlistService } from "src/app/core/services/watchlist.service";
 import { DatabaseService } from "src/app/core/services/database.service";

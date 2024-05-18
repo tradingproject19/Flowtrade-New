@@ -53,9 +53,9 @@ export const MENU: MenuItem[] = [
     },
     {
         id: 70,
-        label: 'Social',
+        label: 'FT Divergance',
         icon: 'bx bx-group',
-        link: '/social',
+        link: '/ft-divergance',
         // posting charts gammification
     },
     {
