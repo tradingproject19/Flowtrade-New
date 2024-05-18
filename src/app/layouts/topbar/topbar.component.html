@@ -188,7 +188,7 @@
         </div>
       </div>
 
-      <div class="dropdown d-inline-block" dropdown>
+      <div class="dropdown d-inline-block" dropdown *ngIf="false">
         <button type="button" class="btn header-item" id="page-header-user-dropdown" dropdownToggle>
           <img *ngIf="flagvalue !== undefined" src="{{flagvalue}}" alt="Header Language" height="16">
           <img *ngIf="flagvalue === undefined" src="{{valueset}}" alt="Header Language" height="16">
@@ -204,7 +204,7 @@
         </div>
       </div>
 
-      <div class="dropdown d-none d-lg-inline-block ms-1" dropdown>
+      <div class="dropdown d-none d-lg-inline-block ms-1" *ngIf="false" dropdown>
         <button type="button" class="btn header-item noti-icon" dropdownToggle>
           <i class="bx bx-customize"></i>
         </button>
@@ -255,13 +255,13 @@
         </div>
       </div>
 
-      <div class="dropdown d-none d-lg-inline-block ms-1">
+      <div class="dropdown d-none d-lg-inline-block ms-1" *ngIf="false">
         <button type="button" class="btn header-item noti-icon" data-toggle="fullscreen" (click)="fullscreen()">
           <i class="bx bx-fullscreen"></i>
         </button>
       </div>
 
-      <div class="dropdown d-inline-block" dropdown>
+      <div class="dropdown d-inline-block" dropdown *ngIf="false">
         <button type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown"
           dropdownToggle>
           <i class="bx bx-bell bx-tada"></i>
@@ -375,7 +375,7 @@
         </div>
       </div>
 
-      <div class="dropdown d-inline-block">
+      <div class="dropdown d-inline-block" *ngIf="false">
         <button type="button" class="btn header-item noti-icon right-bar-toggle" (click)="toggleRightSidebar()">
           <i class="bx bx-cog bx-spin"></i>
         </button>

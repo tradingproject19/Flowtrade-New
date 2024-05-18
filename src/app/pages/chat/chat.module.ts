@@ -36,8 +36,7 @@ import { ChartsModule } from '../charts/charts.module';
     NgApexchartsModule,
     SimplebarAngularModule,
     ModalModule.forRoot(),
-    SharedModule,
-    ChartsModule,
+    SharedModule
   ],
   providers: [BsDropdownConfig],
 })

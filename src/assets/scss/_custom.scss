@@ -425,3 +425,8 @@ a.ck.ck-button.ck-on {
         justify-content: center;
     }
 }
+
+div[class^="group-"]:has(div[class^="wrap-"]):has(div[data-tooltip="Flow Menu"]) {
+  /* Move the dropdown menu button to the left edge of the toolbar */
+  order: -1;
+}

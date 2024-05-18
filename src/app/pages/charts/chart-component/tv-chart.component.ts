@@ -4,6 +4,9 @@ import {
   OnInit,
   OnDestroy,
   AfterViewInit,
+  Output,
+  EventEmitter,
+  Renderer2,
 } from "@angular/core";
 import { ChartDataFeed } from "./datafeed/datafeed";
 import { FirebaseAuthBackend } from "src/app/authUtils";
@@ -37,6 +40,7 @@ import * as moment from "moment";
 import { SaveLoadAdapterService } from "src/app/core/services/save-load-adapter.service";
 import { WatchlistService } from "src/app/core/services/watchlist.service";
 import { DatabaseService } from "src/app/core/services/database.service";
+import { SidebarComponent } from "src/app/layouts/sidebar/sidebar.component";
 @Component({
   selector: "app-chart-component",
   templateUrl: "./tv-chart.component.html",
@@ -127,12 +131,15 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
   set containerId(containerId: ChartingLibraryWidgetOptions["container"]) {
     this._containerId = containerId || this._containerId;
   }
+
+  @Output() logoClick = new EventEmitter<boolean>();
   constructor(
     private datafeed: ChartDataFeed,
     private firebaseBackend: FirebaseAuthBackend,
     private dataService: ChartsDataService,
     private httpService: DatabaseService,
-    private watchListService: WatchlistService
+    private watchListService: WatchlistService,
+    private renderer: Renderer2
   ) {
     this.user = this.firebaseBackend.getAuthenticatedUser();
     this.userId = this.user.uid;
@@ -299,26 +306,35 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
         },
 
         getChartTemplateContent: async (templateName: string) => {
-          return new Promise<any>((data: any) => { });
+          return new Promise<any>((data: any) => {});
         },
         getAllChartTemplates(): Promise<string[]> {
-          return new Promise<any>((data: any) => { });
+          return new Promise<any>((data: any) => {});
         },
         saveChartTemplate(
           newName: string,
           theme: ChartTemplateContent
         ): Promise<void> {
-          return new Promise<any>((data: any) => { });
+          return new Promise<any>((data: any) => {});
         },
         removeChartTemplate(templateName: string): Promise<void> {
-          return new Promise<any>((data: any) => { });
+          return new Promise<any>((data: any) => {});
         },
-        saveLineToolsAndGroups: function (layoutId: string, chartId: string | number, state: LineToolsAndGroupsState): Promise<void> {
+        saveLineToolsAndGroups: function (
+          layoutId: string,
+          chartId: string | number,
+          state: LineToolsAndGroupsState
+        ): Promise<void> {
           throw new Error("Function not implemented.");
         },
-        loadLineToolsAndGroups: function (layoutId: string, chartId: string | number, requestType: LineToolsAndGroupsLoadRequestType, requestContext: LineToolsAndGroupsLoadRequestContext): Promise<Partial<LineToolsAndGroupsState>> {
+        loadLineToolsAndGroups: function (
+          layoutId: string,
+          chartId: string | number,
+          requestType: LineToolsAndGroupsLoadRequestType,
+          requestContext: LineToolsAndGroupsLoadRequestContext
+        ): Promise<Partial<LineToolsAndGroupsState>> {
           throw new Error("Function not implemented.");
-        }
+        },
       },
       //debug: true,
       custom_indicators_getter: (PineJS) => {
@@ -441,45 +457,36 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
       });
     });
     tvWidget.headerReady().then(() => {
-      tvWidget
-        .createDropdown({
-          title: "",
-          tooltip: "Open Main Menu",
-          items: [
-            {
-              title: "item#1",
-              onSelect: () => {
-                console.log("1");
-              },
-            },
-            {
-              title: "item#2",
-              onSelect: () => {
-                //tvWidget.setSymbol("IBM", "1D");
-              },
-            },
-            {
-              title: "item#3",
-              onSelect: () => {
-                tvWidget.activeChart().createStudy("MACD", false, false, {
-                  in_0: 14,
-                  in_1: 30,
-                  in_3: "close",
-                  in_2: 9,
-                });
-              },
-            },
-          ],
-          icon: `<img src="../../../assets/images/logo.png" />`,
-        })
-        .then((myDropdownApi) => {
-          // Use myDropdownApi if you need to update the dropdown:
-          // myDropdownApi.applyOptions({
-          //     title: 'a new title!'
-          // });
-          // Or remove the dropdown:
-          // myDropdownApi.remove();
+      let btn = tvWidget.createButton({
+        useTradingViewStyle: false,
+        align: "left",
+      });
+      btn.setAttribute("data-tooltip", "Flow Menu");
+
+      setTimeout(() => {
+        // Get all div elements whose class starts with "group-"
+        var groupDivs = document.querySelector('iframe').contentDocument.body.querySelectorAll('div[class^="group-"]');
+
+        // Loop through each div with a class starting with "group-"
+        groupDivs.forEach((div) => {
+          // Check if the div contains a child element with data-tooltip="Flow Menu"
+          if (div.querySelector('[data-tooltip="Flow Menu"]')) {
+            // Access the div or perform other actions
+            if (div.nextElementSibling && div.nextElementSibling.classList.contains('separator-')) {
+              // Hide the sibling element by setting display to "none"
+              div.nextElementSibling.setAttribute('style', 'display:none');
+            }
+            // For example, you can access the div's properties or add/remove classes
+            div.setAttribute('style', `order:-1; background:url('../../../assets/images/logo.png');background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;`);
+
+            div.addEventListener('click', () => {
+              this.logoClick.emit(true);
+            }, false)
+          }
         });
+      }, 1500);
     });
   }
 

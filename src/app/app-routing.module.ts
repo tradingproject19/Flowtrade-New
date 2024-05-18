@@ -3,6 +3,7 @@ import { Routes, RouterModule, PreloadAllModules } from "@angular/router";
 
 import { AuthGuard } from "./core/guards/auth.guard";
 import { LayoutComponent } from "./layouts/layout.component";
+import { ClassicComponent } from "./pages/classic/classic.component";
 const routes: Routes = [
   {
     path: "account",
@@ -44,6 +45,15 @@ const routes: Routes = [
       import("./pages/chat/chat.module").then((m) => m.ChatModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: "classic",
+    component:ClassicComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: '**', // route every undefined route to the root of this feature
+    redirectTo: ''
+  }
 ];
 
 @NgModule({

@@ -1,9 +1,9 @@
 {
   "projects": {
-    "default": "tradingproject19-f513b"
+    "default": "tradingproject24"
   },
   "targets": {
-    "tradingproject19-f513b": {
+    "tradingproject24-f513b": {
       "hosting": {
         "flowtrade-beta": [
           "flowtrade-beta"

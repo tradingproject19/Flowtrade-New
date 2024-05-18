@@ -1,0 +1,10 @@
+#iframe-container {
+  overflow: hidden; /* Hide overflow */
+}
+
+#iframe-container iframe {
+  height: 100%;
+  width: 100%;
+  border: none; /* Remove iframe border */
+  overflow: hidden; /* Prevent iframe content from overflowing */
+}

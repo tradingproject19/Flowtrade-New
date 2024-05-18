@@ -15,3 +15,7 @@ div[class^='group-']:has(button[data-tooltip="Open Main Menu"]) + div[class^="se
 button[data-tooltip="Open Main Menu"] div[data-name="dropdown"] {
   padding: 0 10px;
 }
+
+div.has-flow-menu{
+  order:-1 !important
+}

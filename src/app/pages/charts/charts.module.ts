@@ -20,6 +20,8 @@ import { UIModule } from "src/app/shared/ui/ui.module";
 import { SharedModule } from "src/app/shared/shared.module";
 import { WidgetModule } from "src/app/shared/widget/widget.module";
 import { SaveLoadAdapterService } from "src/app/core/services/save-load-adapter.service";
+import { SidebarComponent } from "src/app/layouts/sidebar/sidebar.component";
+import { LayoutsModule } from "src/app/layouts/layouts.module";
 
 @NgModule({
   declarations: [ChartsPageComponent, ChartComponent],
@@ -37,7 +39,8 @@ import { SaveLoadAdapterService } from "src/app/core/services/save-load-adapter.
     NgApexchartsModule,
     SimplebarAngularModule,
     ModalModule.forRoot(),
-    SharedModule
+    SharedModule,
+    LayoutsModule
   ],
   exports: [ChartComponent],
   providers: [BsDropdownConfig, ChartDataFeed, SaveLoadAdapterService],

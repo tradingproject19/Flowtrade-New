@@ -1,8 +1,8 @@
 //
-// right-sidebar.scss
+// left-sidebar.scss
 //
 
-.right-bar {
+.left-bar {
     background-color: var(--#{$prefix}secondary-bg);
     box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.06), 0 1px 0 0 rgba(0, 0, 0, 0.02);
     display: block;
@@ -10,12 +10,12 @@
     transition: all 200ms ease-out;
     width: $rightbar-width;
     z-index: 9999;
-    float: right !important;
-    right: -($rightbar-width + 10px);
+    float: left !important;
+    left: -($rightbar-width + 10px);
     top: 0;
     bottom: 0;
 
-    .right-bar-toggle {
+    .left-bar-toggle {
         background-color: var(--#{$prefix}dark);
         height: 24px;
         width: 24px;
@@ -44,9 +44,9 @@
     transition: all .2s ease-out;
 }
 
-.right-bar-enabled {
-    .right-bar {
-        right: 0;
+.left-bar-enabled {
+    .left-bar {
+        left: 0;
     }
     .rightbar-overlay {
         display: block;
@@ -54,7 +54,7 @@
 }
 
 @include media-breakpoint-down(md) {
-    .right-bar {
+    .left-bar {
         overflow: auto;
         .slimscroll-menu {
             height: auto !important;

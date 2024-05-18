@@ -66,6 +66,8 @@ export class Login2Component implements OnInit {
     } else {
       if (environment.defaultauth === 'firebase') {
         this.authenticationService.login(this.f.email.value, this.f.password.value).then((res: any) => {
+          localStorage.setItem("email", this.f.email.value);
+          localStorage.setItem("password", this.f.password.value);
           this.router.navigate(['/dashboard']);
         })
           .catch(error => {
