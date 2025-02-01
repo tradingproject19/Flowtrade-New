@@ -11,7 +11,7 @@ import {
 import { ChartDataFeed } from "./datafeed/datafeed";
 import { FirebaseAuthBackend } from "src/app/authUtils";
 import { User } from "src/app/core/models/auth.models";
-import uuid from "uuid";
+import * as uuid from "uuid";
 import {
   ChartData,
   ChartMetaInfo,
